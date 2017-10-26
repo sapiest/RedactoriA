@@ -13,6 +13,7 @@ type
     DPoints:Array of TDoublePoint;
     procedure Draw(ACanvas:TCanvas);virtual;abstract;
     procedure AddPoint(ADoublePoint:TDoublePoint);
+
   end;
   TFigureClass = class of TFigure;
   TLines = class(TFigure)
@@ -20,9 +21,15 @@ type
     PenColor:TColor;
 
   end;
+
   TFigures = class(TLines)
     PenBrushColor:TColor;
   end;
+
+  THand = class(TFigure)
+
+  end;
+
   TPolyLine = class(TLines)
     procedure Draw(ACanvas:TCanvas); override;
 
@@ -54,6 +61,8 @@ begin
   Figures[High(Figures)].DPoints[High(DPoints)]:=ADoublePoint;
   SetMinMaxDoublePoints(ADoublePoint);
 end;
+
+
 
 procedure TPolyLine.Draw(ACanvas:TCanvas);
 var
@@ -99,6 +108,8 @@ begin
   ACanvas.Ellipse((Wrld2Canvas(DPoints[Low(DPoints)])).x ,(Wrld2Canvas(DPoints[Low(DPoints)])).y,
   (Wrld2Canvas(DPoints[High(DPoints)])).x,(Wrld2Canvas(DPoints[HIgh(DPoints)])).y);
 end;
+
+
 
 end.
 

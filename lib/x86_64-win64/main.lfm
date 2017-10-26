@@ -52,28 +52,29 @@ object MainForm: TMainForm
     OnMouseMove = PbMouseMove
     OnMouseUp = PbMouseUp
     OnPaint = PbPaint
-    OnResize = PbResize
   end
   object ScrollBarHor: TScrollBar
     Left = 101
     Height = 17
     Top = 542
-    Width = 619
+    Width = 620
     Anchors = [akLeft, akRight, akBottom]
+    Max = 0
     PageSize = 0
     TabOrder = 1
-    Visible = False
+    OnChange = ScrollBarChange
   end
   object ScrollBarVert: TScrollBar
     Left = 703
     Height = 549
     Top = -2
-    Width = 21
+    Width = 620
     Anchors = [akTop, akRight, akBottom]
     Kind = sbVertical
+    Max = 0
     PageSize = 0
     TabOrder = 2
-    Visible = False
+    OnChange = ScrollBarChange
   end
   object MainMenu: TMainMenu
     object MenuFile: TMenuItem

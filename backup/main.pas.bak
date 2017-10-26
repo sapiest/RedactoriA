@@ -30,7 +30,7 @@ type
     procedure BitUNDOClick(Sender: TObject);
     procedure BitREDOClick(Sender: TObject);
     procedure FLoatSpinZoomChange(Sender: TObject);
-
+    //procedure SetScrollBars;
     procedure FormCreate(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 
@@ -38,6 +38,8 @@ type
     procedure MenuAboutClick(Sender: TObject);
     procedure MenuExitClick(Sender: TObject);
     procedure PbResize(Sender: TObject);
+    procedure ScrollBarChange(Sender: TObject);
+
 
 
     procedure ToolsButtonClick(Sender : TObject);
@@ -76,11 +78,14 @@ begin
   close();
 end;
 
-procedure TMainForm.PbResize(Sender: TObject);
+
+procedure TMainForm.ScrollBarChange(Sender: TObject);
 begin
-  CWidth:=pb.Width;
-  CHeight:=pb.Height;
+  Offset:=Point(ScrollBarHor.Position,ScrollBarVert.Position);
+  pb.Invalidate;
 end;
+
+
 
 procedure TMainForm.MenuAboutClick(Sender: TObject);
 begin
@@ -102,8 +107,8 @@ begin
   end;
   if (key=VK_ADD)      or (key=VK_OEM_PLUS)  then
     FLoatSpinZoom.Value := FLoatSpinZoom.Value + 10;
-  {if (key=VK_SUBTRACT) or (key=VK_OEM_MINUS) then
-    FLoatSpinZoom.Value := FLoatSpinZoom.Value - 1; }
+  if (key=VK_SUBTRACT) or (key=VK_OEM_MINUS) then
+    FLoatSpinZoom.Value := FLoatSpinZoom.Value - 1;
 
 end;
 
@@ -113,6 +118,7 @@ var
   AButton: TBitBtn;
   i: integer;
 begin
+  isDrawing:=false;
   AButton:=TBitBtn.Create(Self);
   AButton.Caption:='UNDO';
   AButton.Width := ToolsPanel.Width div 2;
@@ -144,6 +150,8 @@ begin
     AButton.Parent := ToolsPanel;
     AButton.onClick := @ToolsButtonClick;
   end;
+  ScrollBarHor.PageSize:=300;
+  ScrollBarVert.PageSize:=300;
   FLoatSpinZoom.MinValue := ZOOM_MIN * 100;
   FLoatSpinZoom.MaxValue := ZOOM_MAX * 100;
 
@@ -167,7 +175,6 @@ begin
   pb.Invalidate;
 end;
 
-
 procedure TMainform.ToolsButtonClick(Sender : TObject);
 begin
   ATool := Tools[(Sender as TBitBtn).tag];
@@ -182,6 +189,7 @@ begin
   if ssLeft in Shift then begin
     WorldCoord := Canvas2Wrld(Point(X,Y));
     ATool.FigureCreate(WorldCoord.x, WorldCoord.y);
+
   end;
     pb.Invalidate;
 end;
@@ -190,14 +198,17 @@ procedure TMainForm.PbMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integ
   );
 var
    WorldCoord:TDoublePoint;
+   str:string;
 begin
   if (isDrawing) then  begin
     WorldCoord := Canvas2Wrld(Point(X,Y));
     ATool.RaiseLFigure(WorldCoord.x, WorldCoord.y);
     ScrollBarHor.Position := Round(Offset.x);
     ScrollBarVert.Position := Round(Offset.y);
+
   end;
     pb.Invalidate;
+
 end;
 
 procedure TMainForm.PbMouseUp(Sender: TObject; Button: TMouseButton;
@@ -209,12 +220,32 @@ end;
 procedure TMainForm.PbPaint(Sender: TObject);
 var
   i:integer;
+
 begin
   FLoatSpinZoom.Value := Zoom * 100;
   pb.Canvas.Brush.Color:=clWhite;
   pb.Canvas.FillRect(0,0,Width,Height);
   ATool.FiguresDraw(pb);
+  //pb.Canvas.Brush.Style:=bsClear;
+  //pb.Canvas.Rectangle(Wrld2Canvas(MinPoint).x,Wrld2Canvas(MinPoint).y,
+  //Wrld2Canvas(MaxPoint).x,Wrld2Canvas(MaxPoint).y);
+
+
+  if round(MaxPoint.x * Zoom) > ScrollBarHor.Max then
+    ScrollBarHor.Max :=round(MaxPoint.x * Zoom);
+  if round(MinPoint.x * Zoom) < ScrollBarHor.Min then
+    ScrollBarHor.Min :=round(MinPoint.x * Zoom);
+  if round(MaxPoint.y * Zoom) > ScrollBarVert.Max then
+    ScrollBarVert.Max :=round(MaxPoint.y * Zoom);
+  if round(MinPoint.y * Zoom) < ScrollBarVert.Min then
+    ScrollBarVert.Min :=round(MinPoint.y * Zoom);
+
+
+  ScrollBarHor.Position:=Offset.x;
+  ScrollBarVert.Position:=Offset.y;
+
 end;
+
 
 
 initialization

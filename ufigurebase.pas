@@ -16,7 +16,7 @@ type
     procedure CleanREDOFigures;
     procedure WriteUNDOFigures;
     procedure WriteREDOFigures;
-
+    //function getFigure:TFigure;
     procedure FiguresDraw(pb:TPaintBox);
 
   end;
@@ -46,6 +46,11 @@ implementation
 
 uses Main;
 
+function getFigure:TFigure;
+begin
+  result:=Figures[High(Figures)];
+end;
+
 procedure TTool.RaiseLFigure(X,Y:double);
 begin
   Figures[High(Figures)].AddPoint(DoublePoint(X,Y));
@@ -59,7 +64,8 @@ end;
 procedure TTool.writeUNDOFigures;
 begin
   if Length(Figures) > 0 then begin
-    SetLength(REDOFigures,Length(REDOFigures)+1);
+
+     SetLength(REDOFigures,Length(REDOFigures)+1);
     REDOFigures[High(REDOFigures)]:=Figures[High(Figures)];
     SetLength(Figures,High(Figures));
   end;
@@ -102,7 +108,7 @@ begin
   Figures[High(Figures)] := TPolyline.Create;
   isDrawing := true;
   Figures[High(Figures)].AddPoint(DoublePoint(X,Y));
-  SetMinMaxDoublePoints(DoublePoint(X,Y));
+  //SetMinMaxDoublePoints(DoublePoint(X,Y));
 end;
 
 
@@ -112,7 +118,7 @@ begin
   Figures[High(Figures)] := TLine.Create;
   isDrawing := true;
   Figures[High(Figures)].AddPoint(DoublePoint(X,Y));
-  SetMinMaxDoublePoints(DoublePoint(X,Y));
+  //SetMinMaxDoublePoints(DoublePoint(X,Y));
 end;
 
 
@@ -122,7 +128,7 @@ begin
   Figures[High(Figures)] := TRectangle.Create;
   isDrawing := true;
   Figures[High(Figures)].AddPoint(DoublePoint(X,Y));
-  SetMinMaxDoublePoints(DoublePoint(X,Y));
+  //SetMinMaxDoublePoints(DoublePoint(X,Y));
 end;
 
 
@@ -132,7 +138,7 @@ begin
   Figures[High(Figures)] := TEllipse.Create;
   isDrawing := true;
   Figures[High(Figures)].AddPoint(DoublePoint(X,Y));
-  SetMinMaxDoublePoints(DoublePoint(X,Y));
+  //SetMinMaxDoublePoints(DoublePoint(X,Y));
 end;
 
 initialization

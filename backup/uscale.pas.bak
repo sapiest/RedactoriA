@@ -14,7 +14,6 @@ type
   function DoublePoint(AX, AY: double): TDoublePoint;
 
   function Canvas2Wrld(APoint: TPoint): TDoublePoint;
-  //function Wrld2Canvas(AX, AY: double): TPoint;
   function Wrld2Canvas(ADoublePoint:TDoublePoint):TPoint;
   procedure SetScale(AZoom: Double);
   procedure SetOffset(ADoublePoint: TDoublePoint);
@@ -23,7 +22,7 @@ const
   ZOOM_MIN = 0.01;
   ZOOM_MAX = 15.00;
 var
-  Offset:TDoublePoint;
+  Offset:TPoint;
   Zoom: double;
   MaxPoint, MinPoint:TDoublePoint;
 implementation
@@ -38,11 +37,6 @@ implementation
     Result.x:= APoint.x / Zoom + Offset.x;
     Result.y:= APoint.y / Zoom + Offset.y;
   end;
-
-  {function Wrld2Canvas(ADoublePoint: TDoublePoint): TPoint;
-  begin
-    Result:= Wrld2Canvas(ADoublePoint);
-  end;}
 
   function Wrld2Canvas(ADoublePoint: TDoublePoint): TPoint;
   begin
@@ -72,13 +66,13 @@ implementation
       MinPoint.y:=ADoublePoint.y;
   end;
 
-  procedure SetOffset(ADoublePoint: TDoublePoint);
+  procedure SetOffset(APoint: TPoint);
   begin
-    Offset:= ADoublePoint;
+    Offset:= APoint;
   end;
 
   initialization
   Zoom:= 1.0;
-  Offset:= DoublePoint(0,0);
+  Offset:= Point(0,0);
 end.
 
