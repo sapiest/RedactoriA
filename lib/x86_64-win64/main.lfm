@@ -1,0 +1,94 @@
+object MainForm: TMainForm
+  Left = 1094
+  Height = 579
+  Top = 223
+  Width = 723
+  Caption = 'RedactoriA'
+  ClientHeight = 559
+  ClientWidth = 723
+  Constraints.MinHeight = 100
+  Constraints.MinWidth = 100
+  KeyPreview = True
+  Menu = MainMenu
+  OnCreate = FormCreate
+  OnKeyDown = FormKeyDown
+  LCLVersion = '1.6.4.0'
+  object ToolsPanel: TPanel
+    Left = 0
+    Height = 559
+    Top = 0
+    Width = 100
+    Align = alLeft
+    ClientHeight = 559
+    ClientWidth = 100
+    Constraints.MaxWidth = 100
+    Constraints.MinHeight = 50
+    Constraints.MinWidth = 100
+    TabOrder = 0
+    object FLoatSpinZoom: TFloatSpinEdit
+      Left = 0
+      Height = 23
+      Top = 501
+      Width = 104
+      Anchors = [akLeft, akRight, akBottom]
+      Color = clMenu
+      Increment = 1
+      MaxValue = 1500
+      MinValue = 0
+      OnChange = FLoatSpinZoomChange
+      ParentShowHint = False
+      TabOrder = 0
+      Value = 0
+    end
+  end
+  object Pb: TPaintBox
+    Left = 100
+    Height = 559
+    Top = 0
+    Width = 623
+    Align = alClient
+    Anchors = [akRight]
+    OnMouseDown = PbMouseDown
+    OnMouseMove = PbMouseMove
+    OnMouseUp = PbMouseUp
+    OnPaint = PbPaint
+    OnResize = PbResize
+  end
+  object ScrollBarHor: TScrollBar
+    Left = 101
+    Height = 17
+    Top = 542
+    Width = 619
+    Anchors = [akLeft, akRight, akBottom]
+    PageSize = 0
+    TabOrder = 1
+    Visible = False
+  end
+  object ScrollBarVert: TScrollBar
+    Left = 703
+    Height = 549
+    Top = -2
+    Width = 21
+    Anchors = [akTop, akRight, akBottom]
+    Kind = sbVertical
+    PageSize = 0
+    TabOrder = 2
+    Visible = False
+  end
+  object MainMenu: TMainMenu
+    object MenuFile: TMenuItem
+      Caption = 'Файл'
+      object MenuExit: TMenuItem
+        Caption = 'Выход'
+        OnClick = MenuExitClick
+      end
+    end
+    object MenuF1: TMenuItem
+      Caption = 'Справка'
+      object MenuAbout: TMenuItem
+        Caption = 'О программе'
+        OnClick = MenuAboutClick
+      end
+    end
+  end
+end
