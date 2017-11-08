@@ -5,111 +5,109 @@ unit UFigure;
 interface
 
 uses
-  Classes, SysUtils,Graphics,Dialogs,UScale;
+  Classes, SysUtils,Graphics,Dialogs,UScale, Math;
 
 type
   TFigure = class
-    Points:Array of TPoint;
+  public
+    minPoint,maxPoint:TDoublePoint;
     DPoints:Array of TDoublePoint;
     procedure Draw(ACanvas:TCanvas);virtual;abstract;
-    procedure AddPoint(ADoublePoint:TDoublePoint);
-
   end;
   TFigureClass = class of TFigure;
-  TLines = class(TFigure)
-    PenWidth:Integer;
-    PenColor:TColor;
 
-  end;
-
-  TFigures = class(TLines)
-    PenBrushColor:TColor;
-  end;
-
-  THand = class(TFigure)
-
-  end;
-
-  TPolyLine = class(TLines)
+  TPolyLine = class(TFigure)
     procedure Draw(ACanvas:TCanvas); override;
+ end;
 
-  end;
-
-  TLine = class(TLines)
+  TRectangle = class(TFigure)
     procedure Draw(ACanvas:TCanvas); override;
-
   end;
 
-  TRectangle = class(TFigures)
+  TEllipse = class(TFIgure)
     procedure Draw(ACanvas:TCanvas); override;
-
   end;
 
-  TEllipse = class(TFIgures)
-   procedure Draw(ACanvas:TCanvas); override;
-
+  TRectangleMagnifier = class(TFigure)
+    procedure Draw(ACanvas:TCanvas); override;
   end;
 
 var
   Figures: Array of TFigure;
   REDOFigures: Array of TFigure;
+  AFirstPoint:TPoint;
+
 implementation
-
-procedure TFigure.AddPoint(ADoublePoint : TDoublePoint);
-begin
-  SetLength(Figures[High(Figures)].DPoints, length(Figures[High(Figures)].DPoints)+1);
-  Figures[High(Figures)].DPoints[High(DPoints)]:=ADoublePoint;
-  SetMinMaxDoublePoints(ADoublePoint);
-end;
-
-
 
 procedure TPolyLine.Draw(ACanvas:TCanvas);
 var
   i:integer;
 begin
-  PenColor:=clBlack;
-  PenWidth:=6;
-  ACanvas.Pen.Color:=PenColor;
-  ACanvas.Pen.Width:=PenWidth;
   for i := 1 to High(DPoints) do
     ACanvas.Line(Wrld2Canvas(DPoints[i-1]), Wrld2Canvas(DPoints[i]));
+
+  for i:=Low(DPoints) to high(DPoints) do begin
+    minPoint.x:=min(round(minPoint.x),round(DPoints[i].x));
+    minPoint.y:=min(round(minPoint.y),round(DPoints[i].y));
+    maxPoint.x:=max(round(maxPoint.x),round(DPoints[i].x));
+    maxPoint.y:=max(round(maxPoint.y),round(DPoints[i].y));
+  end;
 end;
 
-procedure TLine.Draw(ACanvas:TCanvas);
-
-begin
-  PenColor:=clBlack;
-  PenWidth:=6;
-  ACanvas.Pen.Color:=PenColor;
-  ACanvas.Pen.Width:=PenWidth;
-  ACanvas.Line(Wrld2Canvas(DPoints[0]), Wrld2Canvas(DPoints[High(DPoints)]));
-end;
 
 procedure TRectangle.Draw(ACanvas:TCanvas);
 begin
-  PenColor:=clBlack;
-  PenWidth:=6;
-  ACanvas.Brush.Style:=bsClear;
-  ACanvas.Pen.Color:=PenColor;
-  ACanvas.Pen.Width:=PenWidth;
   ACanvas.Rectangle((Wrld2Canvas(DPoints[Low(DPoints)])).x ,(Wrld2Canvas(DPoints[Low(DPoints)])).y,
   (Wrld2Canvas(DPoints[High(DPoints)])).x,(Wrld2Canvas(DPoints[HIgh(DPoints)])).y);
+
+    if DPoints[1].x > DPoints[0].x then  begin
+      MaxPoint.x:=DPoints[1].x;
+      MinPoint.x:=DPoints[0].x;
+    end
+    else begin
+      MaxPoint.x:=DPoints[0].x;
+      MinPoint.x:=DPoints[1].x;
+    end;
+
+    if DPoints[1].y > DPoints[0].y then  begin
+      MaxPoint.y:=DPoints[1].y;
+      MinPoint.y:=DPoints[0].y;
+    end
+    else begin
+      MaxPoint.y:=DPoints[0].y;
+      MinPoint.y:=DPoints[1].y;
+    end;
 end;
 
 procedure TEllipse.Draw(ACanvas:TCanvas);
 begin
-  PenColor:=clBlack;
-  PenWidth:=6;
-  PenBrushColor:=clGreen;
-  ACanvas.Brush.Style:=bsClear;
-  ACanvas.Pen.Color:=PenColor;
-  ACanvas.Pen.Width:=PenWidth;
   ACanvas.Ellipse((Wrld2Canvas(DPoints[Low(DPoints)])).x ,(Wrld2Canvas(DPoints[Low(DPoints)])).y,
   (Wrld2Canvas(DPoints[High(DPoints)])).x,(Wrld2Canvas(DPoints[HIgh(DPoints)])).y);
+
+  if DPoints[1].x > DPoints[0].x then  begin
+      MaxPoint.x:=DPoints[1].x;
+      MinPoint.x:=DPoints[0].x;
+    end
+    else begin
+      MaxPoint.x:=DPoints[0].x;
+      MinPoint.x:=DPoints[1].x;
+    end;
+
+    if DPoints[1].y > DPoints[0].y then  begin
+      MaxPoint.y:=DPoints[1].y;
+      MinPoint.y:=DPoints[0].y;
+    end
+    else begin
+      MaxPoint.y:=DPoints[0].y;
+      MinPoint.y:=DPoints[1].y;
+    end;
 end;
 
-
+procedure TRectangleMagnifier.Draw(ACanvas:TCanvas);
+begin
+  ACanvas.Frame((Wrld2Canvas(DPoints[Low(DPoints)])).x ,(Wrld2Canvas(DPoints[Low(DPoints)])).y,
+  (Wrld2Canvas(DPoints[High(DPoints)])).x,(Wrld2Canvas(DPoints[HIgh(DPoints)])).y);
+end;
 
 end.
 
