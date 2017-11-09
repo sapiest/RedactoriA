@@ -5,7 +5,7 @@ unit UScale;
 interface
 
 uses
-  Classes, SysUtils,Controls, math,Dialogs;
+  Classes, SysUtils,Controls, math,Dialogs, Graphics;
 type
   TDoublePoint = record
     x, y: Double;
@@ -15,11 +15,17 @@ type
     Top, Bottom: TDoublePoint;
   end;
 
+  RBrushStyle = record
+    Style: TBrushStyle;
+    Index: integer;
+  end;
+
+  RPenStyle = record
+    Style: TPenStyle;
+    Index: integer;
+  end;
+
   TScale = class
-  public
-    //Offset:TPoint;
-    //Zoom: double;
-    //MaxPoint, MinPoint:TDoublePoint;
   end;
 
   function DoublePoint(AX, AY: double): TDoublePoint;
@@ -27,14 +33,22 @@ type
   function Canvas2Wrld(APoint: TPoint): TDoublePoint;
   function Wrld2Canvas(ADoublePoint:TDoublePoint):TPoint;
   procedure SetScale(AZoom: Double);
-  procedure SetMinMaxDoublePoints(ADoublePoint:TDoublePoint);
 const
   ZOOM_MIN = 0.01;
   ZOOM_MAX = 15.00;
 var
   Offset:TPoint;
   Zoom: double;
-  //MaxPoint, MinPoint:TDoublePoint;
+  LastZoom: double;
+  PenColor: TColor;
+  BrushColor: Tcolor;
+  BrushStyle: RBrushStyle;
+  PenStyle: RPenStyle;
+  PenWidthInt: integer;
+
+  RoundX: integer;
+  RoundY: integer;
+
 
 implementation
 
@@ -72,20 +86,7 @@ implementation
       Zoom:= AZoom;
   end;
 
-  procedure SetMinMaxDoublePoints(ADoublePoint:TDoublePoint);
-  begin
-    //if(ADoublePoint.x > MaxPoint.x) then
-    //  MaxPoint.x:=ADoublePoint.x;
-    //if(ADoublePoint.x < MinPoint.x) then
-    //  MinPoint.x:=ADoublePoint.x;
-    //if(ADoublePoint.y > MaxPoint.y) then
-    //  MaxPoint.y:=ADoublePoint.y;
-    //if(ADoublePoint.y < MinPoint.y) then
-    //  MinPoint.y:=ADoublePoint.y;
-  end;
-
   initialization
-  Zoom:= 1.0;
-  Offset:= Point(0,0);
+
 end.
 
