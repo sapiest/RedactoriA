@@ -27,6 +27,10 @@ type
     ScrollBarVert: TScrollBar;
     ToolsPanel: TPanel;
     Pb: TPaintBox;
+
+
+
+    //procedure ResetParameterTool;
     procedure BitUNDOClick(Sender: TObject);
     procedure BitREDOClick(Sender: TObject);
     procedure FLoatSpinZoomChange(Sender: TObject);
@@ -35,8 +39,8 @@ type
     procedure Scroll;
     procedure MenuAboutClick(Sender: TObject);
     procedure MenuExitClick(Sender: TObject);
-    procedure ScrollBarChange(Sender: TObject);
-    //procedure ScrollBarHorChange(Sender: TObject);
+    procedure PanelCreate;
+    procedure PanelDelete;
     procedure ScrollBarHorScroll(Sender: TObject; ScrollCode: TScrollCode;
       var ScrollPos: Integer);
     procedure ScrollBarVertScroll(Sender: TObject; ScrollCode: TScrollCode;
@@ -60,10 +64,9 @@ var
   MainForm: TMainForm;
   isDrawing:boolean;
   ATool: TTool;
-  TPenColor:TColor;
-  TBrushColor:TColor;
-  TPenWidth:Integer;
+  ParameterTool: TPanel;
   CWidth,CHeight:Integer;
+  Toolbar: TPanel;
   LastScrollBarHor, LastScrollBarVert: integer;
 
   MaxPoint, MinPoint:TDoublePoint;
@@ -72,19 +75,36 @@ implementation
 
 {$R *.lfm}
 
+
 { TMainForm }
+
+procedure TMainForm.PanelCreate;
+var
+  PPanel:TPanel;
+begin
+  PPanel:=TPanel.Create(MainForm);
+  PPanel.Parent:=MainForm;
+  PPanel.Anchors:=[akTop,akLeft];
+  PPanel.Name:='PPanel';
+  PPanel.Caption:='';
+  PPanel.Width:=100;
+  PPanel.Height:=300;
+  PPanel.Top:=200;
+  PPanel.Left:=0;
+  //PPanel.Color:=clRed;
+  ATool.PPanelCreate(PPanel);
+end;
+
+procedure TMainForm.PanelDelete;
+begin
+  if FindComponent('PPanel') <> nil then
+    FindComponent('PPanel').Free;
+end;
 
 procedure TMainForm.MenuExitClick(Sender: TObject);
 begin
   close();
 end;
-
-procedure TMainForm.ScrollBarChange(Sender: TObject);
-begin
-  //Offset:=Point(ScrollBarHor.Position,ScrollBarVert.Position);
-  //pb.Invalidate;
-end;
-
 
 procedure TMainForm.ScrollBarHorScroll(Sender: TObject;
   ScrollCode: TScrollCode; var ScrollPos: Integer);
@@ -129,7 +149,16 @@ var
   AButton: TBitBtn;
   i: integer;
 begin
+  LastZoom:=Zoom;
+  Zoom:= 1.0;
+  Offset:= Point(0,0);
   isDrawing:=false;
+  PenWidthInt:=1;
+  RoundX:=10;
+  RoundY:=10;
+  BrushColor:=clWhite;
+  BrushStyle.Style:=bsClear;
+
   AButton:=TBitBtn.Create(Self);
   AButton.Caption:='UNDO';
   AButton.Width := ToolsPanel.Width div 2;
@@ -146,27 +175,26 @@ begin
   AButton.Top := 0;
   AButton.Parent := ToolsPanel;
   AButton.onClick := @BitREDOClick;
-
   for i:=0 to High(Tools) do
   begin
     AButton := TBitBtn.Create(ToolsPanel);
     AButton.Glyph.LoadFromFile(Tools[i].Pic);
-    AButton.Caption := Tools[i].Name;
-    AButton.Margin:=10;
-    AButton.Spacing:=-1;
-    AButton.Width := ToolsPanel.Width;
-    AButton.Height := 50;
-    AButton.Top := (i+1)*50;
+    AButton.Top:=50+(i div 2)*50+10;
+    if (i mod 2) = 0 then
+      AButton.Left:=10
+    else
+      AButton.Left:=50;
+    AButton.Height:=40;
+    AButton.Width:=40;
     AButton.Tag := i;
     AButton.Parent := ToolsPanel;
     AButton.onClick := @ToolsButtonClick;
   end;
-  ScrollBarHor.PageSize:=300;
-  ScrollBarVert.PageSize:=300;
   FLoatSpinZoom.MinValue := ZOOM_MIN * 100;
   FLoatSpinZoom.MaxValue := ZOOM_MAX * 100;
 
 end;
+
 
 procedure TMainForm.BitUNDOClick(Sender: TObject);
 begin
@@ -189,6 +217,8 @@ end;
 procedure TMainform.ToolsButtonClick(Sender : TObject);
 begin
   ATool := Tools[(Sender as TBitBtn).tag];
+  PanelDelete;
+  PanelCreate;
 end;
 
 procedure TMainForm.PbMouseDown(Sender: TObject; Button: TMouseButton;
@@ -214,7 +244,7 @@ end;
 procedure TMainForm.PbMouseUp(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
-  ATool.MouseUp();
+  ATool.MouseUp(Shift,X, Y, Button, FLoatSpinZoom);
   isDrawing:=false;
 end;
 
@@ -226,7 +256,6 @@ begin
   pb.Canvas.Brush.Color:=clWhite;
   pb.Canvas.FillRect(0,0,Width,Height);
   ATool.FiguresDraw(pb);
-  pb.Canvas.Brush.Style:=bsClear;
 
  if Length(Figures)>0 then begin
   MaxPoint.x:=Figures[0].maxPoint.x;
@@ -244,8 +273,6 @@ begin
     if(i.minPoint.y < MinPoint.y) then
       MinPoint.y:=i.minPoint.y;
   end;
-
-
   Scroll;
 
 end;
@@ -257,8 +284,6 @@ var
   WTop, WBottom: TDoublePoint;
   delta: integer;
 begin
-
-
   Poligon := DoubleRect(MinPoint, MaxPoint);
 
   WTop := Canvas2Wrld(Point(0, 0));
