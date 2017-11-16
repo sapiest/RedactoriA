@@ -22,9 +22,19 @@ type
     Style: TStylePenArray;
   end;
 
+
+
   TTool = class
     FigureClass:TFigureClass;
     Names,Pic:string;
+
+    Poligon: TDoubleRect;
+    PSize: TDoublePoint;
+    WTop, WBottom: TDoublePoint;
+    delta: integer;
+    LastScrollBarHor, LastScrollBarVert: integer;
+    procedure Scrolling(pb:TPaintBox;ScrollBarHor: TScrollBar;
+    ScrollBarVert: TScrollBar);
 
     procedure MouseDown(APoint:TPoint);virtual;abstract;
     procedure MouseMove(APoint:TPoint);virtual;abstract;
@@ -40,7 +50,7 @@ type
     procedure CreateColorButton(APanel: TPanel; Name: string; LastColor: TColor; AProcedure: TNotifyEvent);
     procedure CreateSpinEdit(APanel: TPanel; Name: string; LastWidth: integer; AProcedure: TNotifyEvent);
     procedure CreateComboBox(APanel: TPanel; Name: string; NameBrushStyle: TComboBoxName; Index: integer; AProcedure: TNotifyEvent);
-
+    procedure MinMaxPoints;
     procedure CleanREDOFigures;
     procedure WriteUNDOFigures;
     procedure WriteREDOFigures;
@@ -109,10 +119,78 @@ var
   ArrPoints:Array of TDoublePoint;
   TypeBrushStyle: RBrushStyle;
   TypePenStyle: RPenStyle;
+  MaxPoint, MinPoint:TDoublePoint;
 
 implementation
 
 uses Main;
+
+
+procedure TTool.Scrolling(pb:TPaintBox;ScrollBarHor: TScrollBar;
+    ScrollBarVert: TScrollBar);
+begin
+  Poligon :=DoubleRect(MinPoint, MaxPoint);
+
+  WTop := Canvas2Wrld(Point(0, 0));
+  if Poligon.Top.X > WTop.x then
+     Poligon.Top.x := WTop.x;
+  if Poligon.Top.y > WTop.y then
+     Poligon.Top.y := WTop.y;
+  WBottom := Canvas2Wrld(Point(pb.Width, pb.Height));
+  if Poligon.Bottom.x < WBottom.x then
+     Poligon.Bottom.x := WBottom.x;
+  if Poligon.Bottom.y < WBottom.y then
+     Poligon.Bottom.y := WBottom.y;
+  PSize.X := Poligon.Bottom.x - Poligon.Top.x;
+  PSize.Y := Poligon.Bottom.y - Poligon.Top.y;
+  if PSize.x * PSize.y = 0 then exit;
+
+  delta := ScrollBarHor.Max - ScrollBarHor.Min;
+  ScrollBarHor.PageSize := round(pb.Width / (PSize.X * Zoom) * delta);
+  ScrollBarHor.Visible := ScrollBarHor.PageSize < delta;
+  if ScrollBarHor.PageSize < delta then
+  begin
+    if (LastScrollBarHor = ScrollBarHor.Position) then
+      ScrollBarHor.Position := round(((-1) * (offset.x + Poligon.Top.x)) / PSize.X * delta)
+    else
+      offset.x := (-1) * round(ScrollBarHor.Position / delta * PSize.x + Poligon.Top.x);
+    LastScrollBarHor := ScrollBarHor.Position;
+  end;
+
+  delta := ScrollBarVert.Max - ScrollBarVert.Min;
+  ScrollBarVert.PageSize := round(pb.Height / (PSize.y * Zoom) * delta);
+  ScrollBarVert.Visible := ScrollBarVert.PageSize < delta;
+  if ScrollBarVert.PageSize < delta then
+  begin
+    if (LastScrollBarVert = ScrollBarVert.Position) then
+      ScrollBarVert.Position := round(((-1) * (offset.y + Poligon.Top.y)) / PSize.Y * delta)
+    else
+      offset.y := (-1) * round(ScrollBarVert.Position / delta * PSize.y + Poligon.Top.y);
+    LastScrollBarVert := ScrollBarVert.Position;
+  end;
+end;
+
+procedure TTool.MinMaxPoints;
+var
+  i:TFigure;
+begin
+  if Length(Figures)>0 then begin
+  MaxPoint.x:=Figures[0].maxPoint.x;
+  MinPoint.x:=Figures[0].minPoint.x;
+  MaxPoint.y:=Figures[0].maxPoint.y;
+  MinPoint.y:=Figures[0].minPoint.y;
+  end;
+  for i in Figures do begin
+    if(i.maxPoint.x > MaxPoint.x) then
+      MaxPoint.x:=i.maxPoint.x;
+    if(i.minPoint.x < MinPoint.x) then
+      MinPoint.x:=i.minPoint.x;
+    if(i.maxPoint.y > MaxPoint.y) then
+      MaxPoint.y:=i.maxPoint.y;
+    if(i.minPoint.y < MinPoint.y) then
+      MinPoint.y:=i.minPoint.y;
+  end;
+end;
 
 procedure TTool.PenColorButtonChanged(Sender: TObject);
 begin
@@ -257,8 +335,8 @@ end;
 
 procedure TLineTool.PPanelCreate(APanel: TPanel);
 begin
-  CreateColorButton(APanel, 'Pen Color', PenColor,@PenColorButtonChanged);
   CreateSpinEdit(APanel, 'Pen Width', PenWidthInt, @PenWhidthChange);
+  CreateColorButton(APanel, 'Pen Color', PenColor,@PenColorButtonChanged);
   CreateComboBox(APanel, 'Pen Style', TypePenStyle.Name, PenStyle.Index, @PenStyleChange);
 end;
 
@@ -285,8 +363,8 @@ end;
 
 procedure TPolyLineTool.PPanelCreate(APanel: TPanel);
 begin
-  CreateColorButton(APanel, 'Pen Color', PenColor,@PenColorButtonChanged);
   CreateSpinEdit(APanel, 'Pen Width', PenWidthInt, @PenWhidthChange);
+  CreateColorButton(APanel, 'Pen Color', PenColor,@PenColorButtonChanged);
 end;
 
 procedure TRectangleTool.MouseDown(APoint:TPoint);
@@ -313,11 +391,12 @@ end;
 
 procedure TRectangleTool.PPanelCreate (APanel: TPanel);
 begin
-  CreateColorButton(APanel, 'Brush Color', BrushColor, @BrushColorButtonChanged);
-  CreateColorButton(APanel, 'Pen Color', PenColor, @PenColorButtonChanged);
+
   CreateSpinEdit(APanel, 'Pen Width', PenWidthInt, @PenWhidthChange);
   CreateComboBox(APanel, 'Brush Style', TypeBrushStyle.Name, BrushStyle.Index, @BrushStyleChange);
   CreateComboBox(APanel, 'Pen Style', TypePenStyle.Name, PenStyle.Index, @PenStyleChange);
+  CreateColorButton(APanel, 'Brush Color', BrushColor, @BrushColorButtonChanged);
+  CreateColorButton(APanel, 'Pen Color', PenColor, @PenColorButtonChanged);
 end;
 
 procedure TEllipseTool.MouseDown(APoint:TPoint);
@@ -344,11 +423,11 @@ end;
 
 procedure TEllipseTool.PPanelCreate(APanel: TPanel);
 begin
-  CreateColorButton(APanel, 'Brush Color', BrushColor, @BrushColorButtonChanged);
-  CreateColorButton(APanel, 'Pen Color', PenColor,@PenColorButtonChanged);
   CreateSpinEdit(APanel, 'Pen Width', PenWidthInt, @PenWhidthChange);
   CreateComboBox(APanel, 'Brush Style', TypeBrushStyle.Name, BrushStyle.Index, @BrushStyleChange);
   CreateComboBox(APanel, 'Pen Style', TypePenStyle.Name, PenStyle.Index, @PenStyleChange);
+  CreateColorButton(APanel, 'Brush Color', BrushColor, @BrushColorButtonChanged);
+  CreateColorButton(APanel, 'Pen Color', PenColor,@PenColorButtonChanged);
 end;
 
 procedure TRoundRectTool.MouseDown(APoint:TPoint);
@@ -375,13 +454,13 @@ end;
 
 procedure TRoundRectTool.PPanelCreate(APanel: TPanel);
 begin
+  CreateSpinEdit(APanel, 'Pen Width', PenWidthInt, @PenWhidthChange);
+  CreateComboBox(APanel, 'Brush Style', TypeBrushStyle.Name, BrushStyle.Index, @BrushStyleChange);
+  CreateComboBox(APanel, 'Pen Style', TypePenStyle.Name, PenStyle.Index, @PenStyleChange);
   CreateSpinEdit(APanel, 'Round Y', RoundY, @RoundYChange);
   CreateSpinEdit(APanel, 'Round X', RoundX, @RoundXChange);
   CreateColorButton(APanel, 'Brush Color', BrushColor, @BrushColorButtonChanged);
   CreateColorButton(APanel, 'Pen Color', PenColor, @PenColorButtonChanged);
-  CreateSpinEdit(APanel, 'Pen Width', PenWidthInt, @PenWhidthChange);
-  CreateComboBox(APanel, 'Brush Style', TypeBrushStyle.Name, BrushStyle.Index, @BrushStyleChange);
-  CreateComboBox(APanel, 'Pen Style', TypePenStyle.Name, PenStyle.Index, @PenStyleChange);
 end;
 
 procedure TMagnifierTool.MouseDown(APoint:TPoint);

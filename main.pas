@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,LCLType,
-  Menus,Buttons, PairSplitter, ColorBox, StdCtrls, Spin,UFigureBase, UScale, UFigure;
+  Menus,Buttons, StdCtrls, Spin,UFigureBase,UScale;
 
 
 
@@ -28,15 +28,11 @@ type
     ToolsPanel: TPanel;
     Pb: TPaintBox;
 
-
-
-    //procedure ResetParameterTool;
     procedure BitUNDOClick(Sender: TObject);
     procedure BitREDOClick(Sender: TObject);
     procedure FLoatSpinZoomChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
-    procedure Scroll;
     procedure MenuAboutClick(Sender: TObject);
     procedure MenuExitClick(Sender: TObject);
     procedure PanelCreate;
@@ -67,9 +63,7 @@ var
   ParameterTool: TPanel;
   CWidth,CHeight:Integer;
   Toolbar: TPanel;
-  LastScrollBarHor, LastScrollBarVert: integer;
 
-  MaxPoint, MinPoint:TDoublePoint;
 
 implementation
 
@@ -91,7 +85,6 @@ begin
   PPanel.Height:=300;
   PPanel.Top:=200;
   PPanel.Left:=0;
-  //PPanel.Color:=clRed;
   ATool.PPanelCreate(PPanel);
 end;
 
@@ -249,80 +242,14 @@ begin
 end;
 
 procedure TMainForm.PbPaint(Sender: TObject);
-var
-   i:TFigure;
 begin
   FLoatSpinZoom.Value := Zoom * 100;
   pb.Canvas.Brush.Color:=clWhite;
   pb.Canvas.FillRect(0,0,Width,Height);
   ATool.FiguresDraw(pb);
+  ATool.MinMaxPoints;
+  ATool.Scrolling(pb,ScrollBarHor,ScrollBarVert);
 
- if Length(Figures)>0 then begin
-  MaxPoint.x:=Figures[0].maxPoint.x;
-  MinPoint.x:=Figures[0].minPoint.x;
-  MaxPoint.y:=Figures[0].maxPoint.y;
-  MinPoint.y:=Figures[0].minPoint.y;
-  end;
-  for i in Figures do begin
-    if(i.maxPoint.x > MaxPoint.x) then
-      MaxPoint.x:=i.maxPoint.x;
-    if(i.minPoint.x < MinPoint.x) then
-      MinPoint.x:=i.minPoint.x;
-    if(i.maxPoint.y > MaxPoint.y) then
-      MaxPoint.y:=i.maxPoint.y;
-    if(i.minPoint.y < MinPoint.y) then
-      MinPoint.y:=i.minPoint.y;
-  end;
-  Scroll;
-
-end;
-
-procedure TMainForm.Scroll;
-var
-  Poligon: TDoubleRect;
-  PSize: TDoublePoint;
-  WTop, WBottom: TDoublePoint;
-  delta: integer;
-begin
-  Poligon := DoubleRect(MinPoint, MaxPoint);
-
-  WTop := Canvas2Wrld(Point(0, 0));
-  if Poligon.Top.X > WTop.x then
-     Poligon.Top.x := WTop.x;
-  if Poligon.Top.y > WTop.y then
-     Poligon.Top.y := WTop.y;
-  WBottom := Canvas2Wrld(Point(pb.Width, pb.Height));
-  if Poligon.Bottom.x < WBottom.x then
-     Poligon.Bottom.x := WBottom.x;
-  if Poligon.Bottom.y < WBottom.y then
-     Poligon.Bottom.y := WBottom.y;
-  PSize.X := Poligon.Bottom.x - Poligon.Top.x;
-  PSize.Y := Poligon.Bottom.y - Poligon.Top.y;
-  if PSize.x * PSize.y = 0 then exit;
-
-  delta := ScrollBarHor.Max - ScrollBarHor.Min;
-  ScrollBarHor.PageSize := round(pb.Width / (PSize.X * Zoom) * delta);
-  ScrollBarHor.Visible := ScrollBarHor.PageSize < delta;
-  if ScrollBarHor.PageSize < delta then
-  begin
-    if (LastScrollBarHor = ScrollBarHor.Position) then
-      ScrollBarHor.Position := round(((-1) * (offset.x + Poligon.Top.x)) / PSize.X * delta)
-    else
-      offset.x := (-1) * round(ScrollBarHor.Position / delta * PSize.x + Poligon.Top.x);
-    LastScrollBarHor := ScrollBarHor.Position;
-  end;
-
-  delta := ScrollBarVert.Max - ScrollBarVert.Min;
-  ScrollBarVert.PageSize := round(pb.Height / (PSize.y * Zoom) * delta);
-  ScrollBarVert.Visible := ScrollBarVert.PageSize < delta;
-  if ScrollBarVert.PageSize < delta then
-  begin
-    if (LastScrollBarVert = ScrollBarVert.Position) then
-      ScrollBarVert.Position := round(((-1) * (offset.y + Poligon.Top.y)) / PSize.Y * delta)
-    else
-      offset.y := (-1) * round(ScrollBarVert.Position / delta * PSize.y + Poligon.Top.y);
-    LastScrollBarVert := ScrollBarVert.Position;
-  end;
 end;
 
 initialization

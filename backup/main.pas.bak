@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,LCLType,
-  Menus,Buttons, PairSplitter, ColorBox, StdCtrls, Spin,UFigureBase, UScale;
+  Menus,Buttons, PairSplitter, ColorBox, StdCtrls, Spin,UFigureBase,UScale;
 
 
 
@@ -27,21 +27,20 @@ type
     ScrollBarVert: TScrollBar;
     ToolsPanel: TPanel;
     Pb: TPaintBox;
+
     procedure BitUNDOClick(Sender: TObject);
     procedure BitREDOClick(Sender: TObject);
     procedure FLoatSpinZoomChange(Sender: TObject);
-    //procedure SetScrollBars;
     procedure FormCreate(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
-
-    //прописать изменение scrollbar
     procedure MenuAboutClick(Sender: TObject);
     procedure MenuExitClick(Sender: TObject);
-    procedure PbResize(Sender: TObject);
-    procedure ScrollBarChange(Sender: TObject);
-
-
-
+    procedure PanelCreate;
+    procedure PanelDelete;
+    procedure ScrollBarHorScroll(Sender: TObject; ScrollCode: TScrollCode;
+      var ScrollPos: Integer);
+    procedure ScrollBarVertScroll(Sender: TObject; ScrollCode: TScrollCode;
+      var ScrollPos: Integer);
     procedure ToolsButtonClick(Sender : TObject);
     procedure PbMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
@@ -61,31 +60,56 @@ var
   MainForm: TMainForm;
   isDrawing:boolean;
   ATool: TTool;
-  TPenColor:TColor;
-  TBrushColor:TColor;
-  TPenWidth:Integer;
+  ParameterTool: TPanel;
   CWidth,CHeight:Integer;
-  LastScrollBarHor, LastScrollBarVert: integer;
+  Toolbar: TPanel;
+
 
 implementation
 
 {$R *.lfm}
 
+
 { TMainForm }
+
+procedure TMainForm.PanelCreate;
+var
+  PPanel:TPanel;
+begin
+  PPanel:=TPanel.Create(MainForm);
+  PPanel.Parent:=MainForm;
+  PPanel.Anchors:=[akTop,akLeft];
+  PPanel.Name:='PPanel';
+  PPanel.Caption:='';
+  PPanel.Width:=100;
+  PPanel.Height:=300;
+  PPanel.Top:=200;
+  PPanel.Left:=0;
+  ATool.PPanelCreate(PPanel);
+end;
+
+procedure TMainForm.PanelDelete;
+begin
+  if FindComponent('PPanel') <> nil then
+    FindComponent('PPanel').Free;
+end;
 
 procedure TMainForm.MenuExitClick(Sender: TObject);
 begin
   close();
 end;
 
-
-procedure TMainForm.ScrollBarChange(Sender: TObject);
+procedure TMainForm.ScrollBarHorScroll(Sender: TObject;
+  ScrollCode: TScrollCode; var ScrollPos: Integer);
 begin
-  Offset:=Point(ScrollBarHor.Position,ScrollBarVert.Position);
   pb.Invalidate;
 end;
 
-
+procedure TMainForm.ScrollBarVertScroll(Sender: TObject;
+  ScrollCode: TScrollCode; var ScrollPos: Integer);
+begin
+  pb.Invalidate;
+end;
 
 procedure TMainForm.MenuAboutClick(Sender: TObject);
 begin
@@ -118,7 +142,16 @@ var
   AButton: TBitBtn;
   i: integer;
 begin
+  LastZoom:=Zoom;
+  Zoom:= 1.0;
+  Offset:= Point(0,0);
   isDrawing:=false;
+  PenWidthInt:=1;
+  RoundX:=10;
+  RoundY:=10;
+  BrushColor:=clWhite;
+  BrushStyle.Style:=bsClear;
+
   AButton:=TBitBtn.Create(Self);
   AButton.Caption:='UNDO';
   AButton.Width := ToolsPanel.Width div 2;
@@ -135,27 +168,26 @@ begin
   AButton.Top := 0;
   AButton.Parent := ToolsPanel;
   AButton.onClick := @BitREDOClick;
-
   for i:=0 to High(Tools) do
   begin
     AButton := TBitBtn.Create(ToolsPanel);
     AButton.Glyph.LoadFromFile(Tools[i].Pic);
-    AButton.Caption := Tools[i].Name;
-    AButton.Margin:=10;
-    AButton.Spacing:=-1;
-    AButton.Width := ToolsPanel.Width;
-    AButton.Height := 50;
-    AButton.Top := (i+1)*50;
+    AButton.Top:=50+(i div 2)*50+10;
+    if (i mod 2) = 0 then
+      AButton.Left:=10
+    else
+      AButton.Left:=50;
+    AButton.Height:=40;
+    AButton.Width:=40;
     AButton.Tag := i;
     AButton.Parent := ToolsPanel;
     AButton.onClick := @ToolsButtonClick;
   end;
-  ScrollBarHor.PageSize:=300;
-  ScrollBarVert.PageSize:=300;
   FLoatSpinZoom.MinValue := ZOOM_MIN * 100;
   FLoatSpinZoom.MaxValue := ZOOM_MAX * 100;
 
 end;
+
 
 procedure TMainForm.BitUNDOClick(Sender: TObject);
 begin
@@ -178,75 +210,47 @@ end;
 procedure TMainform.ToolsButtonClick(Sender : TObject);
 begin
   ATool := Tools[(Sender as TBitBtn).tag];
+  PanelDelete;
+  PanelCreate;
 end;
 
 procedure TMainForm.PbMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
-var
-  WorldCoord:TDoublePoint;
 begin
   ATool.CleanREDOFigures;
   if ssLeft in Shift then begin
-    WorldCoord := Canvas2Wrld(Point(X,Y));
-    ATool.FigureCreate(WorldCoord.x, WorldCoord.y);
-
+    isDrawing := true;
+    ATool.MouseDown(Point(X,Y));
   end;
     pb.Invalidate;
 end;
 
 procedure TMainForm.PbMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer
   );
-var
-   WorldCoord:TDoublePoint;
-   str:string;
 begin
   if (isDrawing) then  begin
-    WorldCoord := Canvas2Wrld(Point(X,Y));
-    ATool.RaiseLFigure(WorldCoord.x, WorldCoord.y);
-    ScrollBarHor.Position := Round(Offset.x);
-    ScrollBarVert.Position := Round(Offset.y);
-
+    ATool.MouseMove(Point(X,Y));
   end;
     pb.Invalidate;
-
 end;
 
 procedure TMainForm.PbMouseUp(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
+  ATool.MouseUp(Shift,X, Y, Button, FLoatSpinZoom);
   isDrawing:=false;
 end;
 
 procedure TMainForm.PbPaint(Sender: TObject);
-var
-  i:integer;
-
 begin
   FLoatSpinZoom.Value := Zoom * 100;
   pb.Canvas.Brush.Color:=clWhite;
   pb.Canvas.FillRect(0,0,Width,Height);
   ATool.FiguresDraw(pb);
-  //pb.Canvas.Brush.Style:=bsClear;
-  //pb.Canvas.Rectangle(Wrld2Canvas(MinPoint).x,Wrld2Canvas(MinPoint).y,
-  //Wrld2Canvas(MaxPoint).x,Wrld2Canvas(MaxPoint).y);
-
-
-  if round(MaxPoint.x * Zoom) > ScrollBarHor.Max then
-    ScrollBarHor.Max :=round(MaxPoint.x * Zoom);
-  if round(MinPoint.x * Zoom) < ScrollBarHor.Min then
-    ScrollBarHor.Min :=round(MinPoint.x * Zoom);
-  if round(MaxPoint.y * Zoom) > ScrollBarVert.Max then
-    ScrollBarVert.Max :=round(MaxPoint.y * Zoom);
-  if round(MinPoint.y * Zoom) < ScrollBarVert.Min then
-    ScrollBarVert.Min :=round(MinPoint.y * Zoom);
-
-
-  ScrollBarHor.Position:=Offset.x;
-  ScrollBarVert.Position:=Offset.y;
+  ATool.MinMaxPoints;
+  ATool.Scrolling(pb,ScrollBarHor,ScrollBarVert);
 
 end;
-
-
 
 initialization
   Atool:=Tools[0];

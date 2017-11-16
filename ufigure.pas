@@ -14,10 +14,10 @@ type
     BColor: TColor;
     BStyle: TBrushStyle;
     PStyle: TPenStyle;
-    RounX: integer;
-    RounY: integer;
+    RoundedX: integer;
+    RoundedY: integer;
     PWhidth: integer;
-    minPoint,maxPoint:TDoublePoint;
+    MinPoint,MaxPoint:TDoublePoint;
     DPoints:Array of TDoublePoint;
     procedure Draw(ACanvas:TCanvas);virtual;
     constructor Create;virtual;
@@ -60,8 +60,8 @@ end;
 
 constructor TFigure.Create;
 begin
-  RounX:=RoundX;
-  RounY:=RoundY;
+  RoundedX:=RoundX;
+  RoundedY:=RoundY;
   PColor:=PenColor;
   BColor:=BrushColor;
   BStyle:=BrushStyle.Style;
@@ -78,10 +78,10 @@ begin
     ACanvas.Line(Wrld2Canvas(DPoints[i-1]), Wrld2Canvas(DPoints[i]));
 
   for i:=Low(DPoints) to high(DPoints) do begin
-    minPoint.x:=min(round(minPoint.x),round(DPoints[i].x));
-    minPoint.y:=min(round(minPoint.y),round(DPoints[i].y));
-    maxPoint.x:=max(round(maxPoint.x),round(DPoints[i].x));
-    maxPoint.y:=max(round(maxPoint.y),round(DPoints[i].y));
+    MinPoint.x:=min(round(minPoint.x),round(DPoints[i].x));
+    MinPoint.y:=min(round(minPoint.y),round(DPoints[i].y));
+    MaxPoint.x:=max(round(maxPoint.x),round(DPoints[i].x));
+    MaxPoint.y:=max(round(maxPoint.y),round(DPoints[i].y));
   end;
 end;
 
@@ -115,7 +115,7 @@ procedure TRoundRect.Draw(ACanvas:TCanvas);
 begin
   inherited Draw(ACanvas);
   ACanvas.RoundRect((Wrld2Canvas(DPoints[Low(DPoints)])).x ,(Wrld2Canvas(DPoints[Low(DPoints)])).y,
-  (Wrld2Canvas(DPoints[High(DPoints)])).x,(Wrld2Canvas(DPoints[HIgh(DPoints)])).y,RounX,RounY);
+  (Wrld2Canvas(DPoints[High(DPoints)])).x,(Wrld2Canvas(DPoints[HIgh(DPoints)])).y,RoundedX,RoundedY);
 
     if DPoints[1].x > DPoints[0].x then  begin
       MaxPoint.x:=DPoints[1].x;
