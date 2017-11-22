@@ -6,7 +6,11 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,LCLType,
+<<<<<<< HEAD
+  Menus,Buttons, StdCtrls, Spin, UFigureBase, UScale;
+=======
   Menus,Buttons, StdCtrls, Spin,UFigureBase,UScale;
+>>>>>>> d74d7c7dbe047c54207d5bfa5823954a9737bee2
 
 
 
@@ -82,9 +86,16 @@ begin
   PPanel.Name:='PPanel';
   PPanel.Caption:='';
   PPanel.Width:=100;
+<<<<<<< HEAD
+  PPanel.Height:=285;
+  PPanel.Top:=250;
+  PPanel.Left:=0;
+  WritePL:=false;
+=======
   PPanel.Height:=300;
   PPanel.Top:=200;
   PPanel.Left:=0;
+>>>>>>> d74d7c7dbe047c54207d5bfa5823954a9737bee2
   ATool.PPanelCreate(PPanel);
 end;
 
@@ -146,11 +157,19 @@ begin
   Zoom:= 1.0;
   Offset:= Point(0,0);
   isDrawing:=false;
+<<<<<<< HEAD
+  {PenWidthInt:=1;
+  RoundX:=10;
+  RoundY:=10;
+  BrushColor:=clWhite;
+  BrushStyle.Style:=bsClear;}
+=======
   PenWidthInt:=1;
   RoundX:=10;
   RoundY:=10;
   BrushColor:=clWhite;
   BrushStyle.Style:=bsClear;
+>>>>>>> d74d7c7dbe047c54207d5bfa5823954a9737bee2
 
   AButton:=TBitBtn.Create(Self);
   AButton.Caption:='UNDO';
@@ -220,15 +239,30 @@ begin
   ATool.CleanREDOFigures;
   if ssLeft in Shift then begin
     isDrawing := true;
+<<<<<<< HEAD
+    if not WritePL then
+      ATool.MouseDown(Point(X,Y))
+    else
+      ATool.MouseMove(Point(X,Y));
+  end;
+  if ssRight in Shift then
+    WritePL:=false;
+  pb.Invalidate;
+=======
     ATool.MouseDown(Point(X,Y));
   end;
     pb.Invalidate;
+>>>>>>> d74d7c7dbe047c54207d5bfa5823954a9737bee2
 end;
 
 procedure TMainForm.PbMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer
   );
 begin
+<<<<<<< HEAD
+  if (isDrawing) and not WritePL then  begin
+=======
   if (isDrawing) then  begin
+>>>>>>> d74d7c7dbe047c54207d5bfa5823954a9737bee2
     ATool.MouseMove(Point(X,Y));
   end;
     pb.Invalidate;
@@ -237,7 +271,11 @@ end;
 procedure TMainForm.PbMouseUp(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
+<<<<<<< HEAD
+  ATool.MouseUp();
+=======
   ATool.MouseUp(Shift,X, Y, Button, FLoatSpinZoom);
+>>>>>>> d74d7c7dbe047c54207d5bfa5823954a9737bee2
   isDrawing:=false;
 end;
 

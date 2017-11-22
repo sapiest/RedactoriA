@@ -5,6 +5,11 @@ unit UFigureBase;
 interface
 
 uses
+<<<<<<< HEAD
+  Classes, SysUtils,Graphics,UFigure,Dialogs, ExtCtrls, UScale, Controls, Spin, StdCtrls, Buttons, UParams;
+type
+
+=======
   Classes, SysUtils,Graphics,UFigure,Dialogs, ExtCtrls, UScale, Controls, Spin, StdCtrls, Buttons;
 type
 
@@ -24,6 +29,7 @@ type
 
 
 
+>>>>>>> d74d7c7dbe047c54207d5bfa5823954a9737bee2
   TTool = class
     FigureClass:TFigureClass;
     Names,Pic:string;
@@ -38,9 +44,16 @@ type
 
     procedure MouseDown(APoint:TPoint);virtual;abstract;
     procedure MouseMove(APoint:TPoint);virtual;abstract;
+<<<<<<< HEAD
+    procedure MouseUp();virtual;abstract;
+
+    procedure PPanelCreate(APanel:TPanel);virtual;
+    {procedure PenColorButtonChanged(Sender: TObject);
+=======
     procedure MouseUp(Shift: TShiftState; X, Y: Integer; Button: TMouseButton; FLoatSpinZoom: TFloatSpinEdit);virtual;abstract;
     procedure PPanelCreate(APanel:TPanel);virtual;abstract;
     procedure PenColorButtonChanged(Sender: TObject);
+>>>>>>> d74d7c7dbe047c54207d5bfa5823954a9737bee2
     procedure PenWhidthChange(Sender: TObject);
     procedure BrushColorButtonChanged(Sender: TObject);
     procedure BrushStyleChange(Sender: TObject);
@@ -49,7 +62,11 @@ type
     procedure RoundYChange(Sender: TObject);
     procedure CreateColorButton(APanel: TPanel; Name: string; LastColor: TColor; AProcedure: TNotifyEvent);
     procedure CreateSpinEdit(APanel: TPanel; Name: string; LastWidth: integer; AProcedure: TNotifyEvent);
+<<<<<<< HEAD
+    procedure CreateComboBox(APanel: TPanel; Name: string; NameBrushStyle: TComboBoxName; Index: integer; AProcedure: TNotifyEvent);  }
+=======
     procedure CreateComboBox(APanel: TPanel; Name: string; NameBrushStyle: TComboBoxName; Index: integer; AProcedure: TNotifyEvent);
+>>>>>>> d74d7c7dbe047c54207d5bfa5823954a9737bee2
     procedure MinMaxPoints;
     procedure CleanREDOFigures;
     procedure WriteUNDOFigures;
@@ -62,7 +79,11 @@ type
     FirstP:TPoint;
     procedure MouseDown(APoint:TPoint);override;
     procedure MouseMove(APoint:TPoint);override;
+<<<<<<< HEAD
+    procedure MouseUp();override;
+=======
     procedure MouseUp(Shift: TShiftState; X, Y: Integer; Button: TMouseButton; FLoatSpinZoom: TFloatSpinEdit);override;
+>>>>>>> d74d7c7dbe047c54207d5bfa5823954a9737bee2
     procedure PPanelCreate(APanel:TPanel);override;
   end;
 
@@ -70,7 +91,11 @@ type
     FirstP:TPoint;
     procedure MouseDown(APoint:TPoint);override;
     procedure MouseMove(APoint:TPoint);override;
+<<<<<<< HEAD
+    procedure MouseUp();override;
+=======
     procedure MouseUp(Shift: TShiftState; X, Y: Integer; Button: TMouseButton; FLoatSpinZoom: TFloatSpinEdit);override;
+>>>>>>> d74d7c7dbe047c54207d5bfa5823954a9737bee2
     procedure PPanelCreate(APanel:TPanel);override;
   end;
 
@@ -78,7 +103,11 @@ type
     ADoublePoint:TDoublePoint;
     procedure MouseDown(APoint:TPoint);override;
     procedure MouseMove(APoint:TPoint);override;
+<<<<<<< HEAD
+    procedure MouseUp();override;
+=======
     procedure MouseUp(Shift: TShiftState; X, Y: Integer; Button: TMouseButton; FLoatSpinZoom: TFloatSpinEdit);override;
+>>>>>>> d74d7c7dbe047c54207d5bfa5823954a9737bee2
     procedure PPanelCreate(APanel:TPanel);override;
   end;
 
@@ -86,7 +115,19 @@ type
     ADoublePoint:TDoublePoint;
     procedure MouseDown(APoint:TPoint);override;
     procedure MouseMove(APoint:TPoint);override;
+<<<<<<< HEAD
+    procedure MouseUp();override;
+    procedure PPanelCreate(APanel:TPanel);override;
+  end;
+
+  TPenTool = class(TTool)
+    ADoublePoint:TDoublePoint;
+    procedure MouseDown(APoint:TPoint);override;
+    procedure MouseMove(APoint:TPoint);override;
+    procedure MouseUp();override;
+=======
     procedure MouseUp(Shift: TShiftState; X, Y: Integer; Button: TMouseButton; FLoatSpinZoom: TFloatSpinEdit);override;
+>>>>>>> d74d7c7dbe047c54207d5bfa5823954a9737bee2
     procedure PPanelCreate(APanel:TPanel);override;
   end;
 
@@ -94,7 +135,11 @@ type
     ADoublePoint:TDoublePoint;
     procedure MouseDown(APoint:TPoint);override;
     procedure MouseMove(APoint:TPoint);override;
+<<<<<<< HEAD
+    procedure MouseUp();override;
+=======
     procedure MouseUp(Shift: TShiftState; X, Y: Integer; Button: TMouseButton; FLoatSpinZoom: TFloatSpinEdit);override;
+>>>>>>> d74d7c7dbe047c54207d5bfa5823954a9737bee2
     procedure PPanelCreate(APanel:TPanel);override;
   end;
 
@@ -102,7 +147,11 @@ type
     ADoublePoint:TDoublePoint;
     procedure MouseDown(APoint:TPoint);override;
     procedure MouseMove(APoint:TPoint);override;
+<<<<<<< HEAD
+    procedure MouseUp();override;
+=======
     procedure MouseUp(Shift: TShiftState; X, Y: Integer; Button: TMouseButton; FLoatSpinZoom: TFloatSpinEdit);override;
+>>>>>>> d74d7c7dbe047c54207d5bfa5823954a9737bee2
     procedure PPanelCreate(APanel:TPanel);override;
   end;
 
@@ -110,21 +159,40 @@ type
     ADoublePoint:TDoublePoint;
     procedure MouseDown(APoint:TPoint);override;
     procedure MouseMove(APoint:TPoint);override;
+<<<<<<< HEAD
+    procedure MouseUp();override;
+=======
     procedure MouseUp(Shift: TShiftState; X, Y: Integer; Button: TMouseButton; FLoatSpinZoom: TFloatSpinEdit);override;
+>>>>>>> d74d7c7dbe047c54207d5bfa5823954a9737bee2
     procedure PPanelCreate(APanel:TPanel);override;
   end;
 
 var
   Tools:array of TTool;
   ArrPoints:Array of TDoublePoint;
+<<<<<<< HEAD
+  AParam: TParam;
+  MaxPoint, MinPoint:TDoublePoint;
+  writePL:boolean;
+=======
   TypeBrushStyle: RBrushStyle;
   TypePenStyle: RPenStyle;
   MaxPoint, MinPoint:TDoublePoint;
 
+>>>>>>> d74d7c7dbe047c54207d5bfa5823954a9737bee2
 implementation
 
 uses Main;
 
+<<<<<<< HEAD
+procedure TTool.PPanelCreate(APanel:TPanel);
+begin
+  AParam.CreateSpinEdit(APanel, 'Pen Width', PenWidthInt, @AParam.PenWhidthChange);
+  AParam.CreateComboBox(APanel, 'Pen Style', TypePenStyle.Name, PenStyle.Index, @AParam.PenStyleChange);
+  AParam.CreateColorButton(APanel, 'Pen Color', PenColor, @AParam.PenColorButtonChanged);
+end;
+=======
+>>>>>>> d74d7c7dbe047c54207d5bfa5823954a9737bee2
 
 procedure TTool.Scrolling(pb:TPaintBox;ScrollBarHor: TScrollBar;
     ScrollBarVert: TScrollBar);
@@ -192,6 +260,8 @@ begin
   end;
 end;
 
+<<<<<<< HEAD
+=======
 procedure TTool.PenColorButtonChanged(Sender: TObject);
 begin
   PenColor:=(Sender as TColorButton).ButtonColor;
@@ -289,6 +359,7 @@ begin
   ComboBox.OnChange:=AProcedure;
 end;
 
+>>>>>>> d74d7c7dbe047c54207d5bfa5823954a9737bee2
 procedure THandTool.MouseDown(APoint:TPoint);
 begin
   FirstP:=APoint;
@@ -301,7 +372,11 @@ begin
   FirstP:=APoint;
 end;
 
+<<<<<<< HEAD
+procedure THandTool.MouseUp();
+=======
 procedure THandTool.MouseUp(Shift: TShiftState; X, Y: Integer; Button: TMouseButton;FLoatSpinZoom: TFloatSpinEdit);
+>>>>>>> d74d7c7dbe047c54207d5bfa5823954a9737bee2
 begin
 
 end;
@@ -315,7 +390,11 @@ procedure TLineTool.MouseDown(APoint:TPoint);
 begin
   ADoublePoint:=Canvas2Wrld(APoint);
   SetLength(Figures, Length(Figures) + 1);
+<<<<<<< HEAD
+  Figures[High(Figures)] := TLine.Create;
+=======
   Figures[High(Figures)] := TPolyLine.Create;
+>>>>>>> d74d7c7dbe047c54207d5bfa5823954a9737bee2
   SetLength(Figures[High(Figures)].DPoints, length(Figures[High(Figures)].DPoints)+1);
   Figures[High(Figures)].DPoints[High( Figures[High(Figures)].DPoints)]:=ADoublePoint;
   SetLength(Figures[High(Figures)].DPoints, length(Figures[High(Figures)].DPoints)+1);
@@ -325,78 +404,155 @@ end;
 procedure TLineTool.MouseMove(APoint:TPoint);
 begin
   ADoublePoint:=Canvas2Wrld(APoint);
+<<<<<<< HEAD
+  Figures[High(Figures)].DPoints[High(Figures[High(Figures)].DPoints)]:=ADoublePoint;
+end;
+
+procedure TLineTool.MouseUp();
+=======
   Figures[High(Figures)].DPoints[High( Figures[High(Figures)].DPoints)]:=ADoublePoint;
 end;
 
 procedure TLineTool.MouseUp(Shift: TShiftState; X, Y: Integer; Button: TMouseButton;FLoatSpinZoom: TFloatSpinEdit);
+>>>>>>> d74d7c7dbe047c54207d5bfa5823954a9737bee2
 begin
 
 end;
 
 procedure TLineTool.PPanelCreate(APanel: TPanel);
 begin
+<<<<<<< HEAD
+  inherited;
+=======
   CreateSpinEdit(APanel, 'Pen Width', PenWidthInt, @PenWhidthChange);
   CreateColorButton(APanel, 'Pen Color', PenColor,@PenColorButtonChanged);
   CreateComboBox(APanel, 'Pen Style', TypePenStyle.Name, PenStyle.Index, @PenStyleChange);
+>>>>>>> d74d7c7dbe047c54207d5bfa5823954a9737bee2
 end;
 
 procedure TPolyLineTool.MouseDown(APoint:TPoint);
 begin
   ADoublePoint:=Canvas2Wrld(APoint);
   SetLength(Figures, Length(Figures) + 1);
+<<<<<<< HEAD
+  Figures[High(Figures)] := TLine.Create;
+  SetLength(Figures[High(Figures)].DPoints, length(Figures[High(Figures)].DPoints)+1);
+  Figures[High(Figures)].DPoints[High(Figures[High(Figures)].DPoints)]:=ADoublePoint;
+  writePL:=true;
+=======
   Figures[High(Figures)] := TPolyLine.Create;
   SetLength(Figures[High(Figures)].DPoints, length(Figures[High(Figures)].DPoints)+1);
   Figures[High(Figures)].DPoints[High( Figures[High(Figures)].DPoints)]:=ADoublePoint;
+>>>>>>> d74d7c7dbe047c54207d5bfa5823954a9737bee2
 end;
 
 procedure TPolyLineTool.MouseMove(APoint:TPoint);
 begin
   ADoublePoint:=Canvas2Wrld(APoint);
   SetLength(Figures[High(Figures)].DPoints, length(Figures[High(Figures)].DPoints)+1);
+<<<<<<< HEAD
+  Figures[High(Figures)].DPoints[High(Figures[High(Figures)].DPoints)]:=ADoublePoint;
+end;
+
+procedure TPolyLineTool.MouseUp();
+=======
   Figures[High(Figures)].DPoints[High( Figures[High(Figures)].DPoints)]:=ADoublePoint;
 end;
 
 procedure TPolyLineTool.MouseUp(Shift: TShiftState; X, Y: Integer; Button: TMouseButton;FLoatSpinZoom: TFloatSpinEdit);
+>>>>>>> d74d7c7dbe047c54207d5bfa5823954a9737bee2
 begin
 
 end;
 
 procedure TPolyLineTool.PPanelCreate(APanel: TPanel);
 begin
+<<<<<<< HEAD
+  inherited;
+end;
+
+procedure TPenTool.MouseDown(APoint:TPoint);
+begin
+  ADoublePoint:=Canvas2Wrld(APoint);
+  SetLength(Figures, Length(Figures) + 1);
+  Figures[High(Figures)] := TLine.Create;
+  SetLength(Figures[High(Figures)].DPoints, length(Figures[High(Figures)].DPoints)+1);
+  Figures[High(Figures)].DPoints[High(Figures[High(Figures)].DPoints)]:=ADoublePoint;
+end;
+
+procedure TPenTool.MouseMove(APoint:TPoint);
+begin
+  ADoublePoint:=Canvas2Wrld(APoint);
+  SetLength(Figures[High(Figures)].DPoints, length(Figures[High(Figures)].DPoints)+1);
+  Figures[High(Figures)].DPoints[High(Figures[High(Figures)].DPoints)]:=ADoublePoint;
+end;
+
+procedure TPenTool.MouseUp();
+begin
+
+end;
+
+procedure TPenTool.PPanelCreate(APanel:TPanel);
+begin
+  inherited;
+end;
+
+
+=======
   CreateSpinEdit(APanel, 'Pen Width', PenWidthInt, @PenWhidthChange);
   CreateColorButton(APanel, 'Pen Color', PenColor,@PenColorButtonChanged);
 end;
 
+>>>>>>> d74d7c7dbe047c54207d5bfa5823954a9737bee2
 procedure TRectangleTool.MouseDown(APoint:TPoint);
 begin
   ADoublePoint:=Canvas2Wrld(APoint);
   SetLength(Figures, Length(Figures) + 1);
   Figures[High(Figures)] := TRectangle.Create;
   SetLength(Figures[High(Figures)].DPoints, length(Figures[High(Figures)].DPoints)+1);
+<<<<<<< HEAD
+  Figures[High(Figures)].DPoints[High(Figures[High(Figures)].DPoints)]:=ADoublePoint;
+  SetLength(Figures[High(Figures)].DPoints, length(Figures[High(Figures)].DPoints)+1);
+  Figures[High(Figures)].DPoints[High(Figures[High(Figures)].DPoints)]:=ADoublePoint;
+=======
   Figures[High(Figures)].DPoints[High( Figures[High(Figures)].DPoints)]:=ADoublePoint;
   SetLength(Figures[High(Figures)].DPoints, length(Figures[High(Figures)].DPoints)+1);
   Figures[High(Figures)].DPoints[High( Figures[High(Figures)].DPoints)]:=ADoublePoint;
+>>>>>>> d74d7c7dbe047c54207d5bfa5823954a9737bee2
 end;
 
 procedure TRectangleTool.MouseMove(APoint:TPoint);
 begin
   ADoublePoint:=Canvas2Wrld(APoint);
+<<<<<<< HEAD
+  Figures[High(Figures)].DPoints[High(Figures[High(Figures)].DPoints)]:=ADoublePoint;
+end;
+
+procedure TRectangleTool.MouseUp();
+=======
   Figures[High(Figures)].DPoints[High( Figures[High(Figures)].DPoints)]:=ADoublePoint;
 end;
 
 procedure TRectangleTool.MouseUp(Shift: TShiftState; X, Y: Integer; Button: TMouseButton;FLoatSpinZoom: TFloatSpinEdit);
+>>>>>>> d74d7c7dbe047c54207d5bfa5823954a9737bee2
 begin
 
 end;
 
 procedure TRectangleTool.PPanelCreate (APanel: TPanel);
 begin
+<<<<<<< HEAD
+  AParam.CreateColorButton(APanel, 'Brush Color', BrushColor, @AParam.BrushColorButtonChanged);
+  AParam.CreateComboBox(APanel, 'Brush Style', TypeBrushStyle.Name, BrushStyle.Index, @AParam.BrushStyleChange);
+  inherited;
+=======
 
   CreateSpinEdit(APanel, 'Pen Width', PenWidthInt, @PenWhidthChange);
   CreateComboBox(APanel, 'Brush Style', TypeBrushStyle.Name, BrushStyle.Index, @BrushStyleChange);
   CreateComboBox(APanel, 'Pen Style', TypePenStyle.Name, PenStyle.Index, @PenStyleChange);
   CreateColorButton(APanel, 'Brush Color', BrushColor, @BrushColorButtonChanged);
   CreateColorButton(APanel, 'Pen Color', PenColor, @PenColorButtonChanged);
+>>>>>>> d74d7c7dbe047c54207d5bfa5823954a9737bee2
 end;
 
 procedure TEllipseTool.MouseDown(APoint:TPoint);
@@ -416,18 +572,28 @@ begin
   Figures[High(Figures)].DPoints[High( Figures[High(Figures)].DPoints)]:=ADoublePoint;
 end;
 
+<<<<<<< HEAD
+procedure TEllipseTool.MouseUp();
+=======
 procedure TEllipseTool.MouseUp(Shift: TShiftState; X, Y: Integer; Button: TMouseButton;FLoatSpinZoom: TFloatSpinEdit);
+>>>>>>> d74d7c7dbe047c54207d5bfa5823954a9737bee2
 begin
 
 end;
 
 procedure TEllipseTool.PPanelCreate(APanel: TPanel);
 begin
+<<<<<<< HEAD
+  AParam.CreateColorButton(APanel, 'Brush Color', BrushColor, @AParam.BrushColorButtonChanged);
+  AParam.CreateComboBox(APanel, 'Brush Style', TypeBrushStyle.Name, BrushStyle.Index, @AParam.BrushStyleChange);
+  inherited;
+=======
   CreateSpinEdit(APanel, 'Pen Width', PenWidthInt, @PenWhidthChange);
   CreateComboBox(APanel, 'Brush Style', TypeBrushStyle.Name, BrushStyle.Index, @BrushStyleChange);
   CreateComboBox(APanel, 'Pen Style', TypePenStyle.Name, PenStyle.Index, @PenStyleChange);
   CreateColorButton(APanel, 'Brush Color', BrushColor, @BrushColorButtonChanged);
   CreateColorButton(APanel, 'Pen Color', PenColor,@PenColorButtonChanged);
+>>>>>>> d74d7c7dbe047c54207d5bfa5823954a9737bee2
 end;
 
 procedure TRoundRectTool.MouseDown(APoint:TPoint);
@@ -447,13 +613,24 @@ begin
   Figures[High(Figures)].DPoints[High( Figures[High(Figures)].DPoints)]:=ADoublePoint;
 end;
 
+<<<<<<< HEAD
+procedure TRoundRectTool.MouseUp();
+=======
 procedure TRoundRectTool.MouseUp(Shift: TShiftState; X, Y: Integer; Button: TMouseButton;FLoatSpinZoom: TFloatSpinEdit);
+>>>>>>> d74d7c7dbe047c54207d5bfa5823954a9737bee2
 begin
 
 end;
 
 procedure TRoundRectTool.PPanelCreate(APanel: TPanel);
 begin
+<<<<<<< HEAD
+  AParam.CreateColorButton(APanel, 'Brush Color', BrushColor, @AParam.BrushColorButtonChanged);
+  AParam.CreateComboBox(APanel, 'Brush Style', TypeBrushStyle.Name, BrushStyle.Index, @AParam.BrushStyleChange);
+  AParam.CreateSpinEdit(APanel, 'Round Y', RoundY, @AParam.RoundYChange);
+  AParam.CreateSpinEdit(APanel, 'Round X', RoundX, @AParam.RoundXChange);
+  inherited;
+=======
   CreateSpinEdit(APanel, 'Pen Width', PenWidthInt, @PenWhidthChange);
   CreateComboBox(APanel, 'Brush Style', TypeBrushStyle.Name, BrushStyle.Index, @BrushStyleChange);
   CreateComboBox(APanel, 'Pen Style', TypePenStyle.Name, PenStyle.Index, @PenStyleChange);
@@ -461,6 +638,7 @@ begin
   CreateSpinEdit(APanel, 'Round X', RoundX, @RoundXChange);
   CreateColorButton(APanel, 'Brush Color', BrushColor, @BrushColorButtonChanged);
   CreateColorButton(APanel, 'Pen Color', PenColor, @PenColorButtonChanged);
+>>>>>>> d74d7c7dbe047c54207d5bfa5823954a9737bee2
 end;
 
 procedure TMagnifierTool.MouseDown(APoint:TPoint);
@@ -473,7 +651,11 @@ begin
 
 end;
 
+<<<<<<< HEAD
+procedure TMagnifierTool.MouseUp();
+=======
 procedure TMagnifierTool.MouseUp(Shift: TShiftState; X, Y: Integer; Button: TMouseButton; FLoatSpinZoom: TFloatSpinEdit);
+>>>>>>> d74d7c7dbe047c54207d5bfa5823954a9737bee2
 const
   ZoomStep=1;
 begin
@@ -566,6 +748,16 @@ begin
 end;
 
 initialization
+<<<<<<< HEAD
+  RegisterTool(TLineTool.Create, TLine,'Line','line.bmp');
+  RegisterTool(TRectangleTool.Create, TRectangle,'Rectangle','rectangle.bmp');
+  RegisterTool(TEllipseTool.Create, TEllipse,'Ellipse','ellipse.bmp');
+  RegisterTool(TPolylineTool.Create, TLine,'Polyline','lines.bmp');
+  RegisterTool(THandTool.Create, nil ,'Hand', 'hand.bmp');
+  RegisterTool(TPenTool.Create, TLine,'Pen', 'pencil.bmp');
+  RegisterTool(TRoundRectTool.Create, TRoundRect,'RoundRect','roundrect.bmp');
+  //RegisterTool(TMagnifierTool.Create, nil ,'Magnifier','pencil.bmp');
+=======
   RegisterTool(TLineTool.Create, TPolyline,'Line','line.bmp');
   RegisterTool(TRectangleTool.Create, TRectangle,'Rectangle','rectangle.bmp');
   RegisterTool(TEllipseTool.Create, TEllipse,'Ellipse','ellipse.bmp');
@@ -573,6 +765,7 @@ initialization
   RegisterTool(THandTool.Create, nil ,'Hand', 'hand.bmp');
   //RegisterTool(TMagnifierTool.Create, nil ,'Magnifier','pencil.bmp');
   RegisterTool(TRoundRectTool.Create, TRoundRect,'RoundRect','roundrect.bmp');
+>>>>>>> d74d7c7dbe047c54207d5bfa5823954a9737bee2
 
   RegisterBrushSt(bsClear, 'Clear');
   RegisterBrushSt(bsBDiagonal, 'BDiagonal');

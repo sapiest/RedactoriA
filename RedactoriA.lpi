@@ -33,7 +33,11 @@
         <PackageName Value="LCL"/>
       </Item1>
     </RequiredPackages>
+<<<<<<< HEAD
+    <Units Count="6">
+=======
     <Units Count="5">
+>>>>>>> d74d7c7dbe047c54207d5bfa5823954a9737bee2
       <Unit0>
         <Filename Value="RedactoriA.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -61,6 +65,14 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="UScale"/>
       </Unit4>
+<<<<<<< HEAD
+      <Unit5>
+        <Filename Value="uparams.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="UParams"/>
+      </Unit5>
+=======
+>>>>>>> d74d7c7dbe047c54207d5bfa5823954a9737bee2
     </Units>
   </ProjectOptions>
   <CompilerOptions>

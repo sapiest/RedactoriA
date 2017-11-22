@@ -28,7 +28,11 @@ object MainForm: TMainForm
     object FLoatSpinZoom: TFloatSpinEdit
       Left = 0
       Height = 23
+<<<<<<< HEAD
+      Top = 536
+=======
       Top = 501
+>>>>>>> d74d7c7dbe047c54207d5bfa5823954a9737bee2
       Width = 104
       Anchors = [akLeft, akRight, akBottom]
       Color = clMenu
