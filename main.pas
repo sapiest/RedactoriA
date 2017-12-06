@@ -6,11 +6,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,LCLType,
-<<<<<<< HEAD
   Menus,Buttons, StdCtrls, Spin, UFigureBase, UScale;
-=======
-  Menus,Buttons, StdCtrls, Spin,UFigureBase,UScale;
->>>>>>> d74d7c7dbe047c54207d5bfa5823954a9737bee2
 
 
 
@@ -27,6 +23,8 @@ type
     MenuAbout: TMenuItem;
     MenuFile: TMenuItem;
     MenuF1: TMenuItem;
+    MenuItem1: TMenuItem;
+    MenuItem2: TMenuItem;
     ScrollBarHor: TScrollBar;
     ScrollBarVert: TScrollBar;
     ToolsPanel: TPanel;
@@ -34,11 +32,14 @@ type
 
     procedure BitUNDOClick(Sender: TObject);
     procedure BitREDOClick(Sender: TObject);
+    procedure ButtonDeleteFigure(Sender: TObject);
     procedure FLoatSpinZoomChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure MenuAboutClick(Sender: TObject);
     procedure MenuExitClick(Sender: TObject);
+    procedure MenuItem1Click(Sender: TObject);
+    procedure MenuItem2Click(Sender: TObject);
     procedure PanelCreate;
     procedure PanelDelete;
     procedure ScrollBarHorScroll(Sender: TObject; ScrollCode: TScrollCode;
@@ -67,7 +68,7 @@ var
   ParameterTool: TPanel;
   CWidth,CHeight:Integer;
   Toolbar: TPanel;
-
+  panelchange:boolean;
 
 implementation
 
@@ -86,16 +87,12 @@ begin
   PPanel.Name:='PPanel';
   PPanel.Caption:='';
   PPanel.Width:=100;
-<<<<<<< HEAD
-  PPanel.Height:=285;
+  PPanel.Height:=330;
   PPanel.Top:=250;
   PPanel.Left:=0;
   WritePL:=false;
-=======
-  PPanel.Height:=300;
-  PPanel.Top:=200;
-  PPanel.Left:=0;
->>>>>>> d74d7c7dbe047c54207d5bfa5823954a9737bee2
+  ATool.AfterConstruction;
+  ATool.ParPanel:=PPanel;
   ATool.PPanelCreate(PPanel);
 end;
 
@@ -108,6 +105,18 @@ end;
 procedure TMainForm.MenuExitClick(Sender: TObject);
 begin
   close();
+end;
+
+procedure TMainForm.MenuItem1Click(Sender: TObject);
+begin
+  LayerDown;
+  pb.Invalidate;
+end;
+
+procedure TMainForm.MenuItem2Click(Sender: TObject);
+begin
+  LayerUp;
+  pb.Invalidate;
 end;
 
 procedure TMainForm.ScrollBarHorScroll(Sender: TObject;
@@ -144,9 +153,11 @@ begin
     FLoatSpinZoom.Value := FLoatSpinZoom.Value + 10;
   if (key=VK_SUBTRACT) or (key=VK_OEM_MINUS) then
     FLoatSpinZoom.Value := FLoatSpinZoom.Value - 1;
-
+  if (key=46) and (isDrawing=false)then begin
+     DeleteFigure;
+     pb.Invalidate;
+  end;
 end;
-
 
 procedure TMainForm.FormCreate(Sender: TObject);
 var
@@ -157,19 +168,6 @@ begin
   Zoom:= 1.0;
   Offset:= Point(0,0);
   isDrawing:=false;
-<<<<<<< HEAD
-  {PenWidthInt:=1;
-  RoundX:=10;
-  RoundY:=10;
-  BrushColor:=clWhite;
-  BrushStyle.Style:=bsClear;}
-=======
-  PenWidthInt:=1;
-  RoundX:=10;
-  RoundY:=10;
-  BrushColor:=clWhite;
-  BrushStyle.Style:=bsClear;
->>>>>>> d74d7c7dbe047c54207d5bfa5823954a9737bee2
 
   AButton:=TBitBtn.Create(Self);
   AButton.Caption:='UNDO';
@@ -220,6 +218,12 @@ begin
   pb.Invalidate;
 end;
 
+procedure TMainForm.ButtonDeleteFigure(Sender: TObject);
+begin
+  DeleteFigure;
+  Invalidate;
+end;
+
 procedure TMainForm.FLoatSpinZoomChange(Sender: TObject);
 begin
   SetScale(FLoatSpinZoom.Value / 100);
@@ -229,6 +233,8 @@ end;
 procedure TMainform.ToolsButtonClick(Sender : TObject);
 begin
   ATool := Tools[(Sender as TBitBtn).tag];
+  //if not (ATool.ClassName='TMoverTool') then
+    ATool.CleanSelect;
   PanelDelete;
   PanelCreate;
 end;
@@ -237,57 +243,58 @@ procedure TMainForm.PbMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
   ATool.CleanREDOFigures;
+  if ssRight in Shift then
+    if ATool.ClassName='TSelectTool' then begin
+      Atool.rBtnPressed:= not Atool.rBtnPressed;
+      ATool.MouseDown(Point(X,Y));
+      isDrawing := true;
+      WritePL:=false;
+    end;
   if ssLeft in Shift then begin
     isDrawing := true;
-<<<<<<< HEAD
     if not WritePL then
       ATool.MouseDown(Point(X,Y))
     else
       ATool.MouseMove(Point(X,Y));
-  end;
-  if ssRight in Shift then
-    WritePL:=false;
+    end;
+
   pb.Invalidate;
-=======
-    ATool.MouseDown(Point(X,Y));
-  end;
-    pb.Invalidate;
->>>>>>> d74d7c7dbe047c54207d5bfa5823954a9737bee2
 end;
 
 procedure TMainForm.PbMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer
   );
 begin
-<<<<<<< HEAD
-  if (isDrawing) and not WritePL then  begin
-=======
-  if (isDrawing) then  begin
->>>>>>> d74d7c7dbe047c54207d5bfa5823954a9737bee2
+  if (isDrawing) and (not WritePL)then  begin
     ATool.MouseMove(Point(X,Y));
   end;
-    pb.Invalidate;
+  Invalidate;
 end;
 
 procedure TMainForm.PbMouseUp(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
-<<<<<<< HEAD
-  ATool.MouseUp();
-=======
-  ATool.MouseUp(Shift,X, Y, Button, FLoatSpinZoom);
->>>>>>> d74d7c7dbe047c54207d5bfa5823954a9737bee2
+  if not (ATool.ClassName='TSelectTool')then
+    Invalidate;
+  ATool.MouseUp(Point(X,Y));
   isDrawing:=false;
+  panelchange:=false;
+
 end;
 
 procedure TMainForm.PbPaint(Sender: TObject);
 begin
+  if (ATool.ClassName='TSelectTool') and (not panelchange) then begin
+    panelchange:=true;
+    PanelDelete;
+    PanelCreate;
+    Invalidate;
+  end;
   FLoatSpinZoom.Value := Zoom * 100;
   pb.Canvas.Brush.Color:=clWhite;
   pb.Canvas.FillRect(0,0,Width,Height);
   ATool.FiguresDraw(pb);
   ATool.MinMaxPoints;
   ATool.Scrolling(pb,ScrollBarHor,ScrollBarVert);
-
 end;
 
 initialization
