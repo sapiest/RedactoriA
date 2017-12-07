@@ -63,6 +63,7 @@ var
   TypeBrushStyle: RBrushStyle;
   TypePenStyle: RPenStyle;
   iFigure:TFigure;
+  UPDpb:TPaintBox;
 implementation
 
 procedure TParam.SelectedPenColorButtonChanged(Sender: TObject);
@@ -70,6 +71,7 @@ begin
   for iFigure in Figures do
     if iFigure.Selected then
       iFigure.PColor:=(Sender as TColorButton).ButtonColor;
+  UPDpb.Invalidate;
 end;
 
 procedure TParam.PenColorButtonChanged(Sender: TObject);
@@ -82,6 +84,7 @@ begin
   for iFigure in Figures do
     if iFigure.Selected then
       iFigure.BColor:=(Sender as TColorButton).ButtonColor;
+  UPDpb.Invalidate;
 end;
 
 procedure TParam.BrushColorButtonChanged(Sender: TObject);
@@ -99,13 +102,17 @@ begin
   for iFigure in Figures do
     if iFigure.Selected then
       iFigure.PWidth:=(Sender as TSpinEdit).Value;
+  UPDpb.Invalidate;
 end;
 
 procedure TParam.SelectedBrushStyleChange(Sender: TObject);
 begin
    for iFigure in Figures do
-    if iFigure.Selected then
+    if iFigure.Selected then begin
+      iFigure.BStyleInd:=(Sender as TComboBox).ItemIndex;
       iFigure.BStyle:=TypeBrushStyle.Style[(Sender as TComboBox).ItemIndex];
+    end;
+   UPDpb.Invalidate;
 end;
 
 procedure TParam.BrushStyleChange(Sender: TObject);
@@ -117,8 +124,11 @@ end;
 procedure TParam.SelectedPenStyleChange(Sender: TObject);
 begin
   for iFigure in Figures do
-    if iFigure.Selected then
+    if iFigure.Selected then begin
+      iFigure.PStyleInd:=(Sender as TComboBox).ItemIndex;
       iFigure.PStyle:=TypePenStyle.Style[(Sender as TComboBox).ItemIndex];
+    end;
+  UPDpb.Invalidate;
 end;
 
 procedure TParam.PenStyleChange(Sender: TObject);
@@ -132,6 +142,7 @@ begin
    for iFigure in Figures do
     if iFigure.Selected then
       iFigure.RoundedX:=(Sender as TSpinEdit).Value;
+   UPDpb.Invalidate;
 end;
 
 procedure TParam.RoundXChange(Sender: TObject);
@@ -144,6 +155,7 @@ begin
    for iFigure in Figures do
     if iFigure.Selected then
       iFigure.RoundedY:=(Sender as TSpinEdit).Value;
+   UPDpb.Invalidate;
 end;
 
 procedure TParam.RoundYChange(Sender: TObject);
@@ -226,5 +238,11 @@ end;
 
 initialization
 PenWidthInt:=1;
+BrushStyle.Style:=bsSolid;
+BrushStyle.Index:=6;
+BrushColor:=clWhite;
+PenStyle.Style:=psSolid;
+PenStyle.Index:=5;
+
 end.
 

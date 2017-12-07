@@ -19,7 +19,6 @@ type
 
   TTool = class
   public
-    Upb:TPaintBox;
     FigureClass:TFigureClass;
     Names,Pic:string;
     ParPanel:TPanel;
@@ -426,7 +425,7 @@ const
   k=5;
 var
   i:integer;
-  TL,BR,TLF0,BRF0,TLF1,BRF1:TPoint;
+  TL,BR:TPoint;
 begin
   if not rBtnPressed then begin
     ADoublePoint:=Canvas2Wrld(APoint);
@@ -488,23 +487,27 @@ begin
   end
   else if not Transp.transporate then begin
     for iFigure in Figures do begin
-    if iFigure.Selected then
+    if iFigure.Selected then begin
+      if iFigure.CheckRectangle(Wrld2Canvas(iFigure.LTop),Wrld2Canvas(iFigure.RBottom),FirstP) then begin
       for i:=0 to Length(iFigure.DPoints)-1 do begin
          iFigure.DPoints[i].x += round((APoint.x - FirstP.x)/Zoom);
          iFigure.DPoints[i].y += round((APoint.y - FirstP.y)/Zoom);
+       end;
+       FirstP:=APoint;
+       end;
       end;
     end;
-    FirstP:=APoint;
+
   end
   else begin
   for iFigure in Figures do begin
-    if iFigure.Selected then
-         Transp.trFigure.DPoints[Transp.index].x += ((APoint.x - FirstP.x)/Zoom);
-         Transp.trFigure.DPoints[Transp.index].y += ((APoint.y - FirstP.y)/Zoom);
+    if iFigure.Selected then begin
+      Transp.trFigure.DPoints[Transp.index].x += ((APoint.x - FirstP.x)/Zoom);
+      Transp.trFigure.DPoints[Transp.index].y += ((APoint.y - FirstP.y)/Zoom);
+      FirstP:=APoint;
     end;
-  FirstP:=APoint;
+   end;
   end;
-
 end;
 
 procedure TSelectTool.MouseUp(APoint:TPoint);
@@ -718,7 +721,6 @@ begin
     AFigure:=Figures[i];
       AFigure.Draw(pb.Canvas);
   end;
-
 end;
 
 procedure RegisterTool(Tool: TTool; AFigureClass: TFigureClass;AName:String;APicName:String);
@@ -758,7 +760,6 @@ initialization
   RegisterTool(TSelectTool.Create, nil ,'Select','select.bmp');
 
 
-  RegisterBrushSt(bsClear, 'Clear');
   RegisterBrushSt(bsBDiagonal, 'BDiagonal');
   RegisterBrushSt(bsFDiagonal, 'FDiagonal');
   RegisterBrushSt(bsCross, 'Cross');
@@ -767,7 +768,6 @@ initialization
   RegisterBrushSt(bsVertical, 'Vertical');
   RegisterBrushSt(bsSolid, 'Solid');
 
-  RegisterPenSt(psClear, 'Clear');
   RegisterPenSt(psDash, 'Dash');
   RegisterPenSt(psDashDot, 'Dash-Dot');
   RegisterPenSt(psDashDotDot, 'Dash-Dot-Dot');

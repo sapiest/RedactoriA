@@ -23,6 +23,7 @@ type
     PStyleInd:integer;
     BStyleInd:integer;
     Selected: boolean;
+    LTop,RBottom:TDoublePoint;
     MinPoint,MaxPoint:TDoublePoint;
     DPoints:Array of TDoublePoint;
     APoints:Array of TPoint;
@@ -251,7 +252,7 @@ begin
   inherited;
     ACanvas.Line(Wrld2Canvas(DPoints[0]), Wrld2Canvas(DPoints[1]));
 
-  if (Selected = true) then
+  if Selected then
     DrawOutline(DPoints[0],DPoints[1],ACanvas);
   for i:=Low(DPoints) to high(DPoints) do begin
     MinPoint.x:=min(round(minPoint.x),round(DPoints[i].x));
@@ -275,7 +276,6 @@ end;
 procedure TPenLine.Draw(ACanvas:TCanvas);
 var
   i:integer;
-  LTop,RBottom:TDoublePoint;
 begin
   inherited;
 
@@ -283,8 +283,7 @@ begin
     ACanvas.Line(Wrld2Canvas(DPoints[i-1]), Wrld2Canvas(DPoints[i]));
   end;
 
-  if (Selected = true) then
-  begin
+
     LTop.x:=Min(round(DPoints[0].x), round(Dpoints[1].x));
     LTop.y:=Min(round(DPoints[0].y), round(Dpoints[1].y));
     RBottom.x:=Max(round(DPoints[0].x), round(Dpoints[1].x));
@@ -301,9 +300,8 @@ begin
     RBottom.x:=max(RBottom.x,DPoints[i].x);
     RBottom.y:=max(RBottom.y,DPoints[i].y);
   end;
-  DrawOutline(RBottom,LTop,ACanvas);
-  end;
-
+  if (Selected = true) then
+    DrawOutline(RBottom,LTop,ACanvas);
 end;
 
 procedure TRectangle.Draw(ACanvas:TCanvas);
@@ -312,9 +310,11 @@ begin
   ACanvas.Rectangle((Wrld2Canvas(DPoints[Low(DPoints)])).x ,(Wrld2Canvas(DPoints[Low(DPoints)])).y,
   (Wrld2Canvas(DPoints[High(DPoints)])).x,(Wrld2Canvas(DPoints[HIgh(DPoints)])).y);
 
-  if (Selected = true) then
-  begin
-    DrawOutline(DPoints[0],DPoints[1],ACanvas);
+   if (Selected = true) then begin
+     LTop:=DPoints[0];
+     RBottom:=DPoints[1];
+     DrawOutline(LTop,RBottom,ACanvas);
+   end;
 
     if DPoints[1].x > DPoints[0].x then  begin
       MaxPoint.x:=DPoints[1].x;
@@ -333,7 +333,6 @@ begin
       MaxPoint.y:=DPoints[0].y;
       MinPoint.y:=DPoints[1].y;
     end;
-  end;
 end;
 
 procedure TRoundRect.Draw(ACanvas:TCanvas);
@@ -342,9 +341,12 @@ begin
   ACanvas.RoundRect((Wrld2Canvas(DPoints[Low(DPoints)])).x ,(Wrld2Canvas(DPoints[Low(DPoints)])).y,
   (Wrld2Canvas(DPoints[High(DPoints)])).x,(Wrld2Canvas(DPoints[HIgh(DPoints)])).y,RoundedX,RoundedY);
 
-  if (Selected = true) then
-  begin
-    DrawOutline(DPoints[0],DPoints[1],ACanvas);
+  if (Selected = true) then begin
+    LTop:=DPoints[0];
+    RBottom:=DPoints[1];
+    DrawOutline(LTop,RBottom,ACanvas);
+  end;
+
     if DPoints[1].x > DPoints[0].x then  begin
       MaxPoint.x:=DPoints[1].x;
       MinPoint.x:=DPoints[0].x;
@@ -362,7 +364,6 @@ begin
       MaxPoint.y:=DPoints[0].y;
       MinPoint.y:=DPoints[1].y;
     end;
-  end;
 end;
 
 procedure TEllipse.Draw(ACanvas:TCanvas);
@@ -371,9 +372,11 @@ begin
   ACanvas.Ellipse((Wrld2Canvas(DPoints[Low(DPoints)])).x ,(Wrld2Canvas(DPoints[Low(DPoints)])).y,
   (Wrld2Canvas(DPoints[High(DPoints)])).x,(Wrld2Canvas(DPoints[High(DPoints)])).y);
 
-  if (Selected = true) then
-  begin
-    DrawOutline(DPoints[0],DPoints[1],ACanvas);
+  if (Selected = true) then begin
+    LTop:=DPoints[0];
+    RBottom:=DPoints[1];
+    DrawOutline(LTop,RBottom,ACanvas);
+  end;
     if DPoints[1].x > DPoints[0].x then  begin
         MaxPoint.x:=DPoints[1].x;
         MinPoint.x:=DPoints[0].x;
@@ -391,7 +394,6 @@ begin
         MaxPoint.y:=DPoints[0].y;
         MinPoint.y:=DPoints[1].y;
       end;
-    end;
 end;
 
 procedure TSelect.Draw(ACanvas:Tcanvas);

@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,LCLType,
-  Menus,Buttons, StdCtrls, Spin, UFigureBase, UScale;
+  Menus,Buttons, StdCtrls, Spin, UFigureBase, UScale, UParams;
 
 
 
@@ -168,7 +168,7 @@ begin
   Zoom:= 1.0;
   Offset:= Point(0,0);
   isDrawing:=false;
-
+  UPDpb:=Pb;
   AButton:=TBitBtn.Create(Self);
   AButton.Caption:='UNDO';
   AButton.Width := ToolsPanel.Width div 2;
@@ -233,10 +233,10 @@ end;
 procedure TMainform.ToolsButtonClick(Sender : TObject);
 begin
   ATool := Tools[(Sender as TBitBtn).tag];
-  //if not (ATool.ClassName='TMoverTool') then
     ATool.CleanSelect;
   PanelDelete;
   PanelCreate;
+  Invalidate;
 end;
 
 procedure TMainForm.PbMouseDown(Sender: TObject; Button: TMouseButton;
@@ -257,8 +257,7 @@ begin
     else
       ATool.MouseMove(Point(X,Y));
     end;
-
-  pb.Invalidate;
+  Invalidate;
 end;
 
 procedure TMainForm.PbMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer
@@ -273,11 +272,10 @@ end;
 procedure TMainForm.PbMouseUp(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
-  if not (ATool.ClassName='TSelectTool')then
-    Invalidate;
   ATool.MouseUp(Point(X,Y));
   isDrawing:=false;
   panelchange:=false;
+  Invalidate;
 
 end;
 
