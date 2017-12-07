@@ -7,7 +7,10 @@ interface
 uses
   Classes, SysUtils,Graphics,Dialogs,UScale,ExtCtrls, Math ;
 
+
+
 type
+
   TFigure = class
   public
     PColor: TColor;
@@ -19,7 +22,6 @@ type
     PWidth: integer;
     PStyleInd:integer;
     BStyleInd:integer;
-
     Selected: boolean;
     MinPoint,MaxPoint:TDoublePoint;
     DPoints:Array of TDoublePoint;
@@ -34,6 +36,7 @@ type
     procedure DrawOutline(Point1,Point2: TDoublePoint; Canvas: TCanvas); virtual;
     procedure GetParams(GTFigure:TFigure;GPColor:TColor;GPStyle:TPenStyle;GPWidth:integer;GRoundedX:integer;GRoundedY:integer;GBColor:TColor;GBStyle:TBrushStyle);
     procedure FindCorners(var TL, BR: TPoint);
+    procedure DrawAnchors(ACanvas:TCanvas);
     constructor Create;virtual;
   end;
 
@@ -88,7 +91,7 @@ implementation
 procedure TFigure.DrawOutline(Point1,Point2: TDoublePoint; Canvas: TCanvas);
 var
   a:TDoublepoint;
-  k:integer;
+  k,i:integer;
 begin
   if (Point1.X>Point2.X) then
     begin
@@ -102,15 +105,33 @@ begin
       Point1.Y:=Point2.Y;
       Point2.Y:=a.Y;
     end;
-  Canvas.Pen.Color := clBlack;
+  Canvas.Pen.Color := clGray;
   Canvas.Pen.Width := 1;
   Canvas.Pen.Style := psDash;
-  if PWidth < 10 then
-    k:=3
-  else
-    k:=1;
-  Canvas.Frame  (Wrld2Canvas(Point1).x-k*PWidth,Wrld2Canvas(Point1).y-k*PWidth,
-                 Wrld2Canvas(Point2).x+k*PWidth,Wrld2Canvas(Point2).y+k*PWidth);
+  Canvas.Frame (Wrld2Canvas(Point1).x-5-PWidth div 2,Wrld2Canvas(Point1).y-5-PWidth div 2,
+      Wrld2Canvas(Point2).x+5+PWidth div 2,Wrld2Canvas(Point2).y+5+PWidth div 2);
+  Canvas.Pen.Color := clPurple;
+  Canvas.Pen.Width :=2;
+  Canvas.Pen.Style := psSolid;
+  Canvas.Brush.Style:=bsSolid;
+  Canvas.Brush.Color:=Canvas.Pen.Color;
+  if Selected then
+    DrawAnchors(Canvas);
+end;
+
+procedure TFigure.DrawAnchors(ACanvas:TCanvas);
+const
+  k=5;
+var
+  i: integer;
+begin
+  for i := 0 to high(DPoints) do begin
+      ACanvas.Rectangle(Rect(Wrld2Canvas(DPoints[i]).x-k-PWidth div 2,Wrld2Canvas(DPoints[i]).y-k-PWidth div 2,Wrld2Canvas(DPoints[i]).x+k+PWidth div 2,Wrld2Canvas(DPoints[i]).y+k+PWidth div 2));
+      {if ClassParent=TFillFigures then begin
+        ACanvas.Rectangle(Rect(Wrld2Canvas(DPoints[1]).x-k-PWidth div 2,Wrld2Canvas(DPoints[0]).y-k-PWidth div 2,Wrld2Canvas(DPoints[1]).x+k+PWidth div 2,Wrld2Canvas(DPoints[0]).y+k+PWidth div 2));
+        ACanvas.Rectangle(Rect(Wrld2Canvas(DPoints[0]).x-k-PWidth div 2,Wrld2Canvas(DPoints[1]).y-k-PWidth div 2,Wrld2Canvas(DPoints[0]).x+k+PWidth div 2,Wrld2Canvas(DPoints[1]).y+k+PWidth div 2));
+      end;}
+  end;
 end;
 
 procedure TFigure.Draw(ACanvas: TCanvas);
@@ -231,9 +252,7 @@ begin
     ACanvas.Line(Wrld2Canvas(DPoints[0]), Wrld2Canvas(DPoints[1]));
 
   if (Selected = true) then
-  begin
     DrawOutline(DPoints[0],DPoints[1],ACanvas);
-  end;
   for i:=Low(DPoints) to high(DPoints) do begin
     MinPoint.x:=min(round(minPoint.x),round(DPoints[i].x));
     MinPoint.y:=min(round(minPoint.y),round(DPoints[i].y));
@@ -266,7 +285,6 @@ begin
 
   if (Selected = true) then
   begin
-
     LTop.x:=Min(round(DPoints[0].x), round(Dpoints[1].x));
     LTop.y:=Min(round(DPoints[0].y), round(Dpoints[1].y));
     RBottom.x:=Max(round(DPoints[0].x), round(Dpoints[1].x));

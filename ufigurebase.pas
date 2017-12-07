@@ -11,9 +11,15 @@ uses
   Menus
   ;
 type
+  Trans = record
+    transporate:boolean;
+    index:integer;
+    trFigure:TFigure;
+  end;
 
   TTool = class
   public
+    Upb:TPaintBox;
     FigureClass:TFigureClass;
     Names,Pic:string;
     ParPanel:TPanel;
@@ -22,6 +28,7 @@ type
     WTop, WBottom: TDoublePoint;
     delta: integer;
     rBtnPressed:boolean;
+    Transp:Trans;
     LastScrollBarHor, LastScrollBarVert: integer;
     procedure Scrolling(pb:TPaintBox;ScrollBarHor: TScrollBar;
     ScrollBarVert: TScrollBar);
@@ -105,7 +112,8 @@ end;
   end;
 
   TSelectTool = class(TTool)
-     FirstP:TPoint;
+    FirstP:TPoint;
+    iFigure:TFigure;
     GPColor:TColor;
     GPStyle:TPenStyle;
     GPWidth:integer;
@@ -414,6 +422,11 @@ begin
 end;
 
 procedure TSelectTool.MouseDown(APoint:TPoint);
+const
+  k=5;
+var
+  i:integer;
+  TL,BR,TLF0,BRF0,TLF1,BRF1:TPoint;
 begin
   if not rBtnPressed then begin
     ADoublePoint:=Canvas2Wrld(APoint);
@@ -429,9 +442,38 @@ begin
     Figures[High(Figures)].DPoints[High( Figures[High(Figures)].DPoints)]:=ADoublePoint;
     SetLength(Figures[High(Figures)].DPoints, length(Figures[High(Figures)].DPoints)+1);
     Figures[High(Figures)].DPoints[High( Figures[High(Figures)].DPoints)]:=ADoublePoint;
+
   end
   else if rBtnPressed  then begin
     FirstP:=APoint;
+     for iFigure in Figures do begin
+       if iFigure.Selected then
+         for i:=0 to Length(iFigure.DPoints)do begin
+           TL:=Point(Wrld2Canvas(iFigure.DPoints[i]).x-k-iFigure.PWidth div 2,Wrld2Canvas(iFigure.DPoints[i]).y-k-iFigure.PWidth div 2);
+           BR:=Point(Wrld2Canvas(iFigure.DPoints[i]).x+k+iFigure.PWidth div 2,Wrld2Canvas(iFigure.DPoints[i]).y+k+iFigure.PWidth div 2);
+           if iFigure.CheckRectangle(TL,BR,APoint) then begin
+             Transp.transporate:=true;
+             Transp.index:=i;
+             Transp.trFigure:=iFigure;
+           {end
+           else
+           TLF1:=Point(Wrld2Canvas(iFigure.DPoints[1]).x-k-iFigure.PWidth div 2,Wrld2Canvas(iFigure.DPoints[0]).y-k-iFigure.PWidth div 2);
+           BRF1:=Point(Wrld2Canvas(iFigure.DPoints[1]).x+k+iFigure.PWidth div 2,Wrld2Canvas(iFigure.DPoints[0]).y+k+iFigure.PWidth div 2);
+           TLF0:=Point(Wrld2Canvas(iFigure.DPoints[0]).x-k-iFigure.PWidth div 2,Wrld2Canvas(iFigure.DPoints[1]).y-k-iFigure.PWidth div 2);
+           BRF0:=Point(Wrld2Canvas(iFigure.DPoints[0]).x+k+iFigure.PWidth div 2,Wrld2Canvas(iFigure.DPoints[1]).y+k+iFigure.PWidth div 2);
+           if iFigure.CheckRectangle(TLF1,BRF1,APoint)then begin
+             Transp.transporate:=true;
+             Transp.index:=1;
+             Transp.trFigure:=iFigure;
+           end
+           else if iFigure.CheckRectangle(TLF0,BRF0,APoint)then begin
+             Transp.transporate:=true;
+             Transp.index:=0;
+             Transp.trFigure:=iFigure;
+           end; }
+          end;
+       end;
+    end;
   end;
 end;
 
@@ -439,29 +481,36 @@ procedure TSelectTool.MouseMove(APoint:TPoint);
 var
   i:integer;
 begin
+  ADoublePoint:=Canvas2Wrld(APoint);
   if not rBtnPressed then begin
-    ADoublePoint:=Canvas2Wrld(APoint);
     ADPoints[high(ADPoints)]:=ADoublePoint;
     Figures[High(Figures)].DPoints[High( Figures[High(Figures)].DPoints)]:=ADoublePoint;
   end
-  else begin
+  else if not Transp.transporate then begin
     for iFigure in Figures do begin
     if iFigure.Selected then
-      for i:=0 to Length(iFigure.DPoints)do begin
+      for i:=0 to Length(iFigure.DPoints)-1 do begin
          iFigure.DPoints[i].x += round((APoint.x - FirstP.x)/Zoom);
          iFigure.DPoints[i].y += round((APoint.y - FirstP.y)/Zoom);
       end;
     end;
     FirstP:=APoint;
+  end
+  else begin
+  for iFigure in Figures do begin
+    if iFigure.Selected then
+         Transp.trFigure.DPoints[Transp.index].x += ((APoint.x - FirstP.x)/Zoom);
+         Transp.trFigure.DPoints[Transp.index].y += ((APoint.y - FirstP.y)/Zoom);
+    end;
+  FirstP:=APoint;
   end;
 
 end;
 
 procedure TSelectTool.MouseUp(APoint:TPoint);
 var
-  iFigure: TFigure;
-
- begin
+  i:integer;
+begin
 
   if (Length(ADPoints)) = 2 then
     if (abs(ADPoints[0].x - ADPoints[1].x) < 2) and
@@ -469,10 +518,11 @@ var
       SetLength(ADPoints, length(ADPoints) - 1);
 
   if (length(ADPoints) = 1) then begin
-    for iFigure in Figures do
+    for iFigure in Figures do begin
       iFigure.CheckPtIn(Wrld2Canvas(ADPoints[0]));
-    SetLength(ADPoints, length(ADPoints)- 1);
     end;
+    SetLength(ADPoints, length(ADPoints)- 1);
+  end;
 
   if (length(ADPoints) = 2) then begin
     for iFigure in Figures do
@@ -482,8 +532,10 @@ var
 
   if Figures[High(Figures)].ClassName = 'TSelect' then
     SetLength(Figures, length(Figures) - 1);
-  if rBtnPressed then
+  if rBtnPressed then begin
     rBtnPressed:=false;
+    Transp.transporate:=false;
+  end;
 
 
 end;
@@ -516,15 +568,18 @@ begin
     AParam.CreateSpinEdit(APanel, 'Pen Width', GPWidth, @AParam.SelectedPenWidthChange);
   end
   else if bigselected then begin
+    if (GRoundedY or GRoundedX)<> 0 then begin
+      AParam.CreateSpinEdit(APanel, 'Round Y', GRoundedY, @AParam.SelectedRoundYChange);
+      AParam.CreateSpinEdit(APanel, 'Round X', GRoundedX, @AParam.SelectedRoundXChange);
+    end;
     AParam.CreateColorButton(APanel, 'Brush Color', GBColor, @AParam.SelectedBrushColorButtonChanged);
     AParam.CreateComboBox(APanel, 'Brush Style', TypeBrushStyle.Name, BrushStyle.Index, @AParam.SelectedBrushStyleChange);
-    AParam.CreateSpinEdit(APanel, 'Round Y', GRoundedY, @AParam.SelectedRoundYChange);
-    AParam.CreateSpinEdit(APanel, 'Round X', GRoundedX, @AParam.SelectedRoundXChange);
     AParam.CreateComboBox(APanel, 'Pen Style', TypePenStyle.Name, PenStyle.Index, @AParam.SelectedPenStyleChange);
     AParam.CreateColorButton(APanel, 'Pen Color', GPColor, @AParam.SelectedPenColorButtonChanged);
     AParam.CreateSpinEdit(APanel, 'Pen Width', GPWidth, @AParam.SelectedPenWidthChange);
   end;
   AParam.CreateDeleteButton(Apanel,@MainForm.ButtonDeleteFigure);
+
 end;
 
 procedure DeleteFigure;
