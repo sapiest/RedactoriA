@@ -479,6 +479,7 @@ end;
 procedure TSelectTool.MouseMove(APoint:TPoint);
 var
   i:integer;
+  S:string;
 begin
   ADoublePoint:=Canvas2Wrld(APoint);
   if not rBtnPressed then begin
@@ -488,7 +489,7 @@ begin
   else if not Transp.transporate then begin
     for iFigure in Figures do begin
     if iFigure.Selected then begin
-      if iFigure.CheckRectangle(Wrld2Canvas(iFigure.LTop),Wrld2Canvas(iFigure.RBottom),FirstP) then begin
+      if (iFigure.CheckRectangle(Wrld2Canvas(iFigure.LTop),Wrld2Canvas(iFigure.RBottom),FirstP)) then begin
       for i:=0 to Length(iFigure.DPoints)-1 do begin
          iFigure.DPoints[i].x += round((APoint.x - FirstP.x)/Zoom);
          iFigure.DPoints[i].y += round((APoint.y - FirstP.y)/Zoom);

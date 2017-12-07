@@ -252,8 +252,11 @@ begin
   inherited;
     ACanvas.Line(Wrld2Canvas(DPoints[0]), Wrld2Canvas(DPoints[1]));
 
-  if Selected then
-    DrawOutline(DPoints[0],DPoints[1],ACanvas);
+  if Selected then begin
+    LTop:=DPoints[0];
+    RBottom:=DPoints[1];
+    DrawOutline(LTop,RBottom,ACanvas);
+  end;
   for i:=Low(DPoints) to high(DPoints) do begin
     MinPoint.x:=min(round(minPoint.x),round(DPoints[i].x));
     MinPoint.y:=min(round(minPoint.y),round(DPoints[i].y));
