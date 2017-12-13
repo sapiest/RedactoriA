@@ -29,10 +29,10 @@ type
     rBtnPressed:boolean;
     Transp:Trans;
     LastScrollBarHor, LastScrollBarVert: integer;
-    procedure Scrolling(pb:TPaintBox;ScrollBarHor: TScrollBar;
-    ScrollBarVert: TScrollBar);
+    procedure Scrolling(
+      pb:TPaintBox;ScrollBarHor: TScrollBar; ScrollBarVert: TScrollBar);
 
-    procedure CleanSelect;
+    procedure ClearSelect;
     procedure MouseDown(APoint:TPoint);virtual;abstract;
     procedure MouseMove(APoint:TPoint);virtual;abstract;
     procedure MouseUp(APoint:TPoint);virtual;abstract;
@@ -135,16 +135,17 @@ end;
   procedure LayerUp;
 
 var
-  Tools:array of TTool;
-  ArrPoints:Array of TDoublePoint;
+  Tools: array of TTool;
+  ArrPoints: Array of TDoublePoint;
   AParam: TParam;
   MaxPoint, MinPoint:TDoublePoint;
-  writePL:boolean;
+  writePL: boolean;
+
 implementation
 
 uses Main;
 
-procedure TTool.CleanSelect;
+procedure TTool.ClearSelect;
 var
   iFigure:TFigure;
 begin
@@ -750,16 +751,15 @@ begin
 end;
 
 initialization
-  RegisterTool(TLineTool.Create, TLine,'Line','line.bmp');
-  RegisterTool(TRectangleTool.Create, TRectangle,'Rectangle','rectangle.bmp');
-  RegisterTool(TEllipseTool.Create, TEllipse,'Ellipse','ellipse.bmp');
-  RegisterTool(TPolylineTool.Create, TLine,'Polyline','lines.bmp');
-  RegisterTool(THandTool.Create, nil ,'Hand', 'hand.bmp');
-  RegisterTool(TPenTool.Create, TPenLine,'Pen', 'pencil.bmp');
-  RegisterTool(TRoundRectTool.Create, TRoundRect,'RoundRect','roundrect.bmp');
-  //RegisterTool(TMagnifierTool.Create, nil ,'Magnifier','pencil.bmp');
-  RegisterTool(TSelectTool.Create, nil ,'Select','select.bmp');
-
+  RegisterTool(TLineTool.Create, TLine,'Line','assets/line.bmp');
+  RegisterTool(TRectangleTool.Create, TRectangle,'Rectangle','assets/rectangle.bmp');
+  RegisterTool(TEllipseTool.Create, TEllipse,'Ellipse','assets/ellipse.bmp');
+  RegisterTool(TPolylineTool.Create, TLine,'Polyline','assets/lines.bmp');
+  RegisterTool(THandTool.Create, nil ,'Hand', 'assets/hand.bmp');
+  RegisterTool(TPenTool.Create, TPenLine,'Pen', 'assets/pencil.bmp');
+  RegisterTool(TRoundRectTool.Create, TRoundRect,'RoundRect','assets/roundrect.bmp');
+  //RegisterTool(TMagnifierTool.Create, nil ,'Magnifier','assets/pencil.bmp');
+  RegisterTool(TSelectTool.Create, nil ,'Select','assets/select.bmp');
 
   RegisterBrushSt(bsBDiagonal, 'BDiagonal');
   RegisterBrushSt(bsFDiagonal, 'FDiagonal');

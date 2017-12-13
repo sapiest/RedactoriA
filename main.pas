@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,LCLType,
-  Menus,Buttons, StdCtrls, Spin, UFigureBase, UScale, UParams;
+  Menus,Buttons, StdCtrls, Spin, UFigureBase, UScale, UParams, superobject,UFigure,jsonConf;
 
 
 
@@ -23,8 +23,13 @@ type
     MenuAbout: TMenuItem;
     MenuFile: TMenuItem;
     MenuF1: TMenuItem;
-    MenuItem1: TMenuItem;
-    MenuItem2: TMenuItem;
+    MenuItemLoad: TMenuItem;
+    MenuItemSave: TMenuItem;
+    MenuItem3: TMenuItem;
+    MenuItemUp: TMenuItem;
+    MenuItemDown: TMenuItem;
+    OpenD: TOpenDialog;
+    SaveD: TSaveDialog;
     ScrollBarHor: TScrollBar;
     ScrollBarVert: TScrollBar;
     ToolsPanel: TPanel;
@@ -38,8 +43,12 @@ type
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure MenuAboutClick(Sender: TObject);
     procedure MenuExitClick(Sender: TObject);
-    procedure MenuItem1Click(Sender: TObject);
-    procedure MenuItem2Click(Sender: TObject);
+    procedure MenuFileClick(Sender: TObject);
+    procedure MenuItemLoadClick(Sender: TObject);
+    procedure MenuItemSaveClick(Sender: TObject);
+    procedure MenuItem3Click(Sender: TObject);
+    procedure MenuItemUpClick(Sender: TObject);
+    procedure MenuItemDownClick(Sender: TObject);
     procedure PanelCreate;
     procedure PanelDelete;
     procedure ScrollBarHorScroll(Sender: TObject; ScrollCode: TScrollCode;
@@ -60,7 +69,8 @@ type
   public
     { public declarations }
   end;
-
+const
+  FiguresName: Array[0..4] of TFigureClass = (TRectangle,TLine,TPenLine,TRoundRect,TEllipse);
 var
   MainForm: TMainForm;
   isDrawing:boolean;
@@ -107,13 +117,113 @@ begin
   close();
 end;
 
-procedure TMainForm.MenuItem1Click(Sender: TObject);
+procedure TMainForm.MenuFileClick(Sender: TObject);
+begin
+
+end;
+
+procedure TMainForm.MenuItemLoadClick(Sender: TObject);
+var
+ JS: ISuperObject;
+ JSA,JSA1:TSuperArray;
+ load:TextFile;
+ S,S1,S2,buf:String;
+ i,j,k:integer;
+ iFigure:TFigure;
+begin
+  if OpenD.Execute then begin
+    SetLength(Figures,0);
+    FreeAndNil(Figures);
+    AssignFile(load,OpenD.FileName);
+    Reset(load);
+    while not EOF(load) do begin
+      Readln(load,buf);
+      S:=S+buf;
+      JS:=SO(S);
+    end;
+    closefile(load);
+    JSA:=(JS.A['TFigures.Figure']);
+    for i:=0 to JSA.Length-1 do begin
+      SetLength(Figures,Length(Figures)+1);
+      S1:= SO(JSA.S[i]).S['name'];
+      for j:=0 to Length(FiguresName)-1 do begin
+        if FiguresName[j].ClassName=S1 then
+          Figures[i]:=FiguresName[j].Create;
+      end;
+      Figures[i].PWidth:=SO(JSA.S[i]).i['PenWidth'];
+      Figures[i].PStyleInd:=SO(JSA.S[i]).i['PenStyleInd'];
+      Figures[i].PColor:=(SO(JSA.S[i]).i['PenColor']);
+      Figures[i].BColor:=(SO(JSA.S[i]).i['BrushColor']);
+      Figures[i].BStyleInd:=SO(JSA.S[i]).i['BrushStyleInd'];
+      JSA1:=SO(JSA.S[i]).A['coord'];
+      k:=0;
+      for j:=0 to (JSA1.Length div 2)-1 do begin
+        SetLength(Figures[i].DPoints, Length(Figures[i].DPoints)+1);
+        Figures[i].DPoints[high(Figures[i].DPoints)]:=Canvas2Wrld(Point(JSA1.i[k],JSA1.i[k+1]));
+        K:=k+2;
+      end;
+    end;
+  end;
+end;
+
+procedure TMainForm.MenuItemSaveClick(Sender: TObject);
+var
+ obj:TSuperObject;
+ save:TextFile;
+ i,j:integer;
+ Sname:String;
+ Scoord:Array of TDoublePoint;
+begin
+  if SaveD.Execute then begin
+    AssignFile(save,SaveD.FileName);
+    Rewrite(save);
+    writeln(save,'{"TFigures":');
+    writeln(save,'  {');
+    write(save,'    "Figure":');
+    writeln(save,'[');
+    for i:=0 to Length(Figures)-1 do begin
+      Sname:=Figures[i].ClassName;
+      write(save,'    {"name":'+'"'+Sname+'",');
+      write(save,'"coord":[');
+      for j:=0 to length(Figures[i].DPoints)-1 do begin
+        SetLength(Scoord,Length(Scoord)+1);
+        Scoord[j]:=Figures[i].DPoints[j];
+        if j=length(Figures[i].DPoints)-1 then
+          write(save,FloatToStr(Scoord[j].x)+','+FloatToStr(Scoord[j].y))
+        else
+          write(save,FloatToStr(Scoord[j].x)+','+FloatToStr(Scoord[j].y)+',');
+      end;
+      write(save,'],');
+      write(save,'"PenWidth":'+IntToStr(Figures[i].PWidth)+',');
+    //write(save,'"PenStyle":'+Figures[i].PStyle+',');
+      write(save,'"PenStyleInd":'+IntToStr(Figures[i].PStyleInd)+',');
+      write(save,'"PenColor":'+IntToStr(ColorToRGB(Figures[i].PColor))+',');
+      write(save,'"BrushColor":'+IntToStr(ColorToRGB(Figures[i].BColor))+',');
+   // write(save,'"BrushStyle":'+Figures[i].BStyle+',');
+    if i<>Length(Figures)-1 then
+      writeln(save,'"BrushStyleInd":'+IntToStr(Figures[i].BStyleInd)+'},')
+    else
+      write(save,'"BrushStyleInd":'+IntToStr(Figures[i].BStyleInd)+'}');
+    end;
+    writeln(save,']');
+    writeln(save,'  }');
+    write(save,'}');
+    closefile(save);
+  end;
+end;
+
+procedure TMainForm.MenuItem3Click(Sender: TObject);
+begin
+
+end;
+
+procedure TMainForm.MenuItemUpClick(Sender: TObject);
 begin
   LayerDown;
   pb.Invalidate;
 end;
 
-procedure TMainForm.MenuItem2Click(Sender: TObject);
+procedure TMainForm.MenuItemDownClick(Sender: TObject);
 begin
   LayerUp;
   pb.Invalidate;
@@ -233,7 +343,7 @@ end;
 procedure TMainform.ToolsButtonClick(Sender : TObject);
 begin
   ATool := Tools[(Sender as TBitBtn).tag];
-    ATool.CleanSelect;
+    ATool.ClearSelect;
   PanelDelete;
   PanelCreate;
   Invalidate;
