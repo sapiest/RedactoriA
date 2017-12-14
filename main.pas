@@ -152,9 +152,11 @@ begin
       end;
       Figures[i].PWidth:=SO(JSA.S[i]).i['PenWidth'];
       Figures[i].PStyleInd:=SO(JSA.S[i]).i['PenStyleInd'];
+      Figures[i].PStyle:=TypePenStyle.Style[Figures[i].PStyleInd];
       Figures[i].PColor:=(SO(JSA.S[i]).i['PenColor']);
       Figures[i].BColor:=(SO(JSA.S[i]).i['BrushColor']);
       Figures[i].BStyleInd:=SO(JSA.S[i]).i['BrushStyleInd'];
+      Figures[i].BStyle:=TypeBrushStyle.Style[Figures[i].BStyleInd];
       JSA1:=SO(JSA.S[i]).A['coord'];
       k:=0;
       for j:=0 to (JSA1.Length div 2)-1 do begin
