@@ -130,7 +130,7 @@ end;
     procedure PPanelCreate(APanel:TPanel);override;
   end;
 
-  procedure DeleteFigure;
+  //procedure DeleteFigure;
   procedure LayerDown;
   procedure LayerUp;
 
@@ -142,8 +142,6 @@ var
   writePL: boolean;
 
 implementation
-
-uses Main;
 
 procedure TTool.ClearSelect;
 var
@@ -455,22 +453,6 @@ begin
              Transp.transporate:=true;
              Transp.index:=i;
              Transp.trFigure:=iFigure;
-           {end
-           else
-           TLF1:=Point(Wrld2Canvas(iFigure.DPoints[1]).x-k-iFigure.PWidth div 2,Wrld2Canvas(iFigure.DPoints[0]).y-k-iFigure.PWidth div 2);
-           BRF1:=Point(Wrld2Canvas(iFigure.DPoints[1]).x+k+iFigure.PWidth div 2,Wrld2Canvas(iFigure.DPoints[0]).y+k+iFigure.PWidth div 2);
-           TLF0:=Point(Wrld2Canvas(iFigure.DPoints[0]).x-k-iFigure.PWidth div 2,Wrld2Canvas(iFigure.DPoints[1]).y-k-iFigure.PWidth div 2);
-           BRF0:=Point(Wrld2Canvas(iFigure.DPoints[0]).x+k+iFigure.PWidth div 2,Wrld2Canvas(iFigure.DPoints[1]).y+k+iFigure.PWidth div 2);
-           if iFigure.CheckRectangle(TLF1,BRF1,APoint)then begin
-             Transp.transporate:=true;
-             Transp.index:=1;
-             Transp.trFigure:=iFigure;
-           end
-           else if iFigure.CheckRectangle(TLF0,BRF0,APoint)then begin
-             Transp.transporate:=true;
-             Transp.index:=0;
-             Transp.trFigure:=iFigure;
-           end; }
           end;
        end;
     end;
@@ -583,25 +565,8 @@ begin
     AParam.CreateColorButton(APanel, 'Pen Color', GPColor, @AParam.SelectedPenColorButtonChanged);
     AParam.CreateSpinEdit(APanel, 'Pen Width', GPWidth, @AParam.SelectedPenWidthChange);
   end;
-  AParam.CreateDeleteButton(Apanel,@MainForm.ButtonDeleteFigure);
+  AParam.CreateDeleteButton(Apanel,@AParam.DeleteFigure);
 
-end;
-
-procedure DeleteFigure;
-var
-  i, j: integer;
-begin
-  j := 0;
-
-  for i := 0 to high(Figures) do
-    if (Figures[i].Selected) then
-      FreeAndNil(Figures[i])
-    else begin
-      Figures[j] := Figures[i];
-      inc(j);
-    end;
-
-  SetLength(Figures, j);
 end;
 
 procedure LayerDown;

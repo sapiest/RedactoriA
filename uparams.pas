@@ -40,6 +40,7 @@ type
     RoundedX: integer;
     RoundedY: integer;
     PWidth: integer;
+    procedure DeleteFigure(Sender:TObject);
     procedure SelectedPenColorButtonChanged(Sender: TObject);
     procedure PenColorButtonChanged(Sender: TObject);
     procedure PenWidthChange(Sender: TObject);
@@ -65,6 +66,22 @@ var
   iFigure:TFigure;
   UPDpb:TPaintBox;
 implementation
+
+procedure TParam.DeleteFigure(Sender: TObject);
+var
+  i, j: integer;
+begin
+  j := 0;
+  for i := 0 to high(Figures) do
+    if (Figures[i].Selected) then
+      FreeAndNil(Figures[i])
+    else begin
+      Figures[j] := Figures[i];
+      inc(j);
+    end;
+ SetLength(Figures, j);
+ UPDpb.Invalidate;
+end;
 
 procedure TParam.SelectedPenColorButtonChanged(Sender: TObject);
 begin

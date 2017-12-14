@@ -6,15 +6,13 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,LCLType,
-  Menus,Buttons, StdCtrls, Spin, UFigureBase, UScale, UParams, superobject,UFigure,jsonConf;
+  Menus,Buttons, StdCtrls, Spin, UFigureBase, UScale, UParams, superobject,UFigure;
 
 
 
 type
 
-
-
-  { TMainForm }
+{ TMainForm }
 
   TMainForm = class(TForm)
     FLoatSpinZoom: TFloatSpinEdit;
@@ -37,7 +35,6 @@ type
 
     procedure BitUNDOClick(Sender: TObject);
     procedure BitREDOClick(Sender: TObject);
-    procedure ButtonDeleteFigure(Sender: TObject);
     procedure FLoatSpinZoomChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -197,11 +194,9 @@ begin
       end;
       write(save,'],');
       write(save,'"PenWidth":'+IntToStr(Figures[i].PWidth)+',');
-    //write(save,'"PenStyle":'+Figures[i].PStyle+',');
       write(save,'"PenStyleInd":'+IntToStr(Figures[i].PStyleInd)+',');
       write(save,'"PenColor":'+IntToStr(ColorToRGB(Figures[i].PColor))+',');
       write(save,'"BrushColor":'+IntToStr(ColorToRGB(Figures[i].BColor))+',');
-   // write(save,'"BrushStyle":'+Figures[i].BStyle+',');
     if i<>Length(Figures)-1 then
       writeln(save,'"BrushStyleInd":'+IntToStr(Figures[i].BStyleInd)+'},')
     else
@@ -266,7 +261,7 @@ begin
   if (key=VK_SUBTRACT) or (key=VK_OEM_MINUS) then
     FLoatSpinZoom.Value := FLoatSpinZoom.Value - 1;
   if (key=46) and (isDrawing=false)then begin
-     DeleteFigure;
+     AParam.DeleteFigure(Sender);
      pb.Invalidate;
   end;
 end;
@@ -330,12 +325,6 @@ begin
   pb.Invalidate;
 end;
 
-procedure TMainForm.ButtonDeleteFigure(Sender: TObject);
-begin
-  DeleteFigure;
-  Invalidate;
-end;
-
 procedure TMainForm.FLoatSpinZoomChange(Sender: TObject);
 begin
   SetScale(FLoatSpinZoom.Value / 100);
@@ -388,7 +377,6 @@ begin
   isDrawing:=false;
   panelchange:=false;
   Invalidate;
-
 end;
 
 procedure TMainForm.PbPaint(Sender: TObject);
