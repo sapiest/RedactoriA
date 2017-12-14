@@ -19,6 +19,7 @@ type
 
   TTool = class
   public
+    MaxPoint, MinPoint:TDoublePoint;
     FigureClass:TFigureClass;
     Names,Pic:string;
     ParPanel:TPanel;
@@ -28,13 +29,15 @@ type
     delta: integer;
     rBtnPressed:boolean;
     Transp:Trans;
+    writePL: boolean;
+    ADoublePoint:TDoublePoint;
     LastScrollBarHor, LastScrollBarVert: integer;
     procedure Scrolling(
       pb:TPaintBox;ScrollBarHor: TScrollBar; ScrollBarVert: TScrollBar);
 
     procedure ClearSelect;
-    procedure MouseDown(APoint:TPoint);virtual;abstract;
-    procedure MouseMove(APoint:TPoint);virtual;abstract;
+    procedure MouseDown(APoint:TPoint);virtual;
+    procedure MouseMove(APoint:TPoint);virtual;
     procedure MouseUp(APoint:TPoint);virtual;abstract;
 
     procedure PPanelCreate(APanel:TPanel);virtual;
@@ -63,7 +66,6 @@ end;
   end;
 
   TPolyLineTool = class(TTool)
-    ADoublePoint:TDoublePoint;
     procedure MouseDown(APoint:TPoint);override;
     procedure MouseMove(APoint:TPoint);override;
     procedure MouseUp(APoint:TPoint);override;
@@ -71,7 +73,6 @@ end;
   end;
 
   TLineTool = class(TTool)
-    ADoublePoint:TDoublePoint;
     procedure MouseDown(APoint:TPoint);override;
     procedure MouseMove(APoint:TPoint);override;
     procedure MouseUp(APoint:TPoint);override;
@@ -79,7 +80,6 @@ end;
   end;
 
   TPenTool = class(TTool)
-    ADoublePoint:TDoublePoint;
     procedure MouseDown(APoint:TPoint);override;
     procedure MouseMove(APoint:TPoint);override;
     procedure MouseUp(APoint:TPoint);override;
@@ -87,7 +87,6 @@ end;
   end;
 
   TRectangleTool = class(TTool)
-    ADoublePoint:TDoublePoint;
     procedure MouseDown(APoint:TPoint);override;
     procedure MouseMove(APoint:TPoint);override;
     procedure MouseUp(APoint:TPoint);override;
@@ -95,7 +94,6 @@ end;
   end;
 
   TRoundRectTool = class(TTool)
-    ADoublePoint:TDoublePoint;
     procedure MouseDown(APoint:TPoint);override;
     procedure MouseMove(APoint:TPoint);override;
     procedure MouseUp(APoint:TPoint);override;
@@ -103,7 +101,6 @@ end;
   end;
 
   TEllipseTool = class(TTool)
-    ADoublePoint:TDoublePoint;
     procedure MouseDown(APoint:TPoint);override;
     procedure MouseMove(APoint:TPoint);override;
     procedure MouseUp(APoint:TPoint);override;
@@ -122,7 +119,6 @@ end;
     GBStyle:TBrushStyle;
     bigselected:boolean;
     lineselected:boolean;
-    ADoublePoint:TDoublePoint;
     ADPoints:Array of TDoublePoint;
     procedure MouseDown(APoint:TPoint);override;
     procedure MouseMove(APoint:TPoint);override;
@@ -130,20 +126,29 @@ end;
     procedure PPanelCreate(APanel:TPanel);override;
   end;
 
-  //procedure DeleteFigure;
   procedure LayerDown;
   procedure LayerUp;
 
 var
   Tools: array of TTool;
-  ArrPoints: Array of TDoublePoint;
   AParam: TParam;
-  MaxPoint, MinPoint:TDoublePoint;
-  writePL: boolean;
 
 implementation
 
-uses Main;
+procedure TTool.MouseDown(Apoint:TPoint);
+begin
+  ADoublePoint:=Canvas2Wrld(APoint);
+  SetLength(Figures[High(Figures)].DPoints, length(Figures[High(Figures)].DPoints)+1);
+  Figures[High(Figures)].DPoints[High( Figures[High(Figures)].DPoints)]:=ADoublePoint;
+  SetLength(Figures[High(Figures)].DPoints, length(Figures[High(Figures)].DPoints)+1);
+  Figures[High(Figures)].DPoints[High( Figures[High(Figures)].DPoints)]:=ADoublePoint;
+end;
+
+procedure TTool.MouseMove(Apoint:TPoint);
+begin
+  ADoublePoint:=Canvas2Wrld(APoint);
+  Figures[High(Figures)].DPoints[High(Figures[High(Figures)].DPoints)]:=ADoublePoint;
+end;
 
 procedure TTool.ClearSelect;
 var
@@ -250,19 +255,14 @@ end;
 
 procedure TLineTool.MouseDown(APoint:TPoint);
 begin
-  ADoublePoint:=Canvas2Wrld(APoint);
   SetLength(Figures, Length(Figures) + 1);
   Figures[High(Figures)] := TLine.Create;
-  SetLength(Figures[High(Figures)].DPoints, length(Figures[High(Figures)].DPoints)+1);
-  Figures[High(Figures)].DPoints[High( Figures[High(Figures)].DPoints)]:=ADoublePoint;
-  SetLength(Figures[High(Figures)].DPoints, length(Figures[High(Figures)].DPoints)+1);
-  Figures[High(Figures)].DPoints[High( Figures[High(Figures)].DPoints)]:=ADoublePoint;
+  inherited;
 end;
 
 procedure TLineTool.MouseMove(APoint:TPoint);
 begin
-  ADoublePoint:=Canvas2Wrld(APoint);
-  Figures[High(Figures)].DPoints[High(Figures[High(Figures)].DPoints)]:=ADoublePoint;
+  inherited;
 end;
 
 procedure TLineTool.MouseUp(APoint:TPoint);
@@ -277,19 +277,16 @@ end;
 
 procedure TPolyLineTool.MouseDown(APoint:TPoint);
 begin
-  ADoublePoint:=Canvas2Wrld(APoint);
   SetLength(Figures, Length(Figures) + 1);
   Figures[High(Figures)] := TPenLine.Create;
-  SetLength(Figures[High(Figures)].DPoints, length(Figures[High(Figures)].DPoints)+1);
-  Figures[High(Figures)].DPoints[High(Figures[High(Figures)].DPoints)]:=ADoublePoint;
+  inherited;
   writePL:=true;
 end;
 
 procedure TPolyLineTool.MouseMove(APoint:TPoint);
 begin
-  ADoublePoint:=Canvas2Wrld(APoint);
   SetLength(Figures[High(Figures)].DPoints, length(Figures[High(Figures)].DPoints)+1);
-  Figures[High(Figures)].DPoints[High(Figures[High(Figures)].DPoints)]:=ADoublePoint;
+  inherited;
 end;
 
 procedure TPolyLineTool.MouseUp(APoint:TPoint);
@@ -304,22 +301,15 @@ end;
 
 procedure TPenTool.MouseDown(APoint:TPoint);
 begin
-  ADoublePoint:=Canvas2Wrld(APoint);
   SetLength(Figures, Length(Figures) + 1);
   Figures[High(Figures)] := TPenLine.Create;
-  SetLength(Figures[High(Figures)].APoints,length(Figures[High(Figures)].APoints)+1);
-  SetLength(Figures[High(Figures)].DPoints, length(Figures[High(Figures)].DPoints)+1);
-  Figures[High(Figures)].DPoints[High(Figures[High(Figures)].DPoints)]:=ADoublePoint;
-  Figures[High(Figures)].APoints[High(Figures[High(Figures)].APoints)]:=APoint;
+  inherited;
 end;
 
 procedure TPenTool.MouseMove(APoint:TPoint);
 begin
-  ADoublePoint:=Canvas2Wrld(APoint);
   SetLength(Figures[High(Figures)].DPoints, length(Figures[High(Figures)].DPoints)+1);
-  Figures[High(Figures)].DPoints[High(Figures[High(Figures)].DPoints)]:=ADoublePoint;
-  SetLength(Figures[High(Figures)].APoints,length(Figures[High(Figures)].APoints)+1);
-  Figures[High(Figures)].APoints[High(Figures[High(Figures)].APoints)]:=APoint;
+  inherited;
 end;
 
 procedure TPenTool.MouseUp(APoint:TPoint);
@@ -334,19 +324,14 @@ end;
 
 procedure TRectangleTool.MouseDown(APoint:TPoint);
 begin
-  ADoublePoint:=Canvas2Wrld(APoint);
   SetLength(Figures, Length(Figures) + 1);
   Figures[High(Figures)] := TRectangle.Create;
-  SetLength(Figures[High(Figures)].DPoints, length(Figures[High(Figures)].DPoints)+1);
-  Figures[High(Figures)].DPoints[High(Figures[High(Figures)].DPoints)]:=ADoublePoint;
-  SetLength(Figures[High(Figures)].DPoints, length(Figures[High(Figures)].DPoints)+1);
-  Figures[High(Figures)].DPoints[High(Figures[High(Figures)].DPoints)]:=ADoublePoint;
+  inherited;
 end;
 
 procedure TRectangleTool.MouseMove(APoint:TPoint);
 begin
-  ADoublePoint:=Canvas2Wrld(APoint);
-  Figures[High(Figures)].DPoints[High(Figures[High(Figures)].DPoints)]:=ADoublePoint;
+  inherited;
 end;
 
 procedure TRectangleTool.MouseUp(APoint:TPoint);
@@ -363,19 +348,14 @@ end;
 
 procedure TEllipseTool.MouseDown(APoint:TPoint);
 begin
-  ADoublePoint:=Canvas2Wrld(APoint);
   SetLength(Figures, Length(Figures) + 1);
   Figures[High(Figures)] := TEllipse.Create;
-  SetLength(Figures[High(Figures)].DPoints, length(Figures[High(Figures)].DPoints)+1);
-  Figures[High(Figures)].DPoints[High( Figures[High(Figures)].DPoints)]:=ADoublePoint;
-  SetLength(Figures[High(Figures)].DPoints, length(Figures[High(Figures)].DPoints)+1);
-  Figures[High(Figures)].DPoints[High( Figures[High(Figures)].DPoints)]:=ADoublePoint;
+  inherited;
 end;
 
 procedure TEllipseTool.MouseMove(APoint:TPoint);
 begin
-  ADoublePoint:=Canvas2Wrld(APoint);
-  Figures[High(Figures)].DPoints[High( Figures[High(Figures)].DPoints)]:=ADoublePoint;
+  inherited;
 end;
 
 procedure TEllipseTool.MouseUp(APoint:TPoint);
@@ -392,19 +372,14 @@ end;
 
 procedure TRoundRectTool.MouseDown(APoint:TPoint);
 begin
-  ADoublePoint:=Canvas2Wrld(APoint);
   SetLength(Figures, Length(Figures) + 1);
   Figures[High(Figures)] := TRoundRect.Create;
-  SetLength(Figures[High(Figures)].DPoints, length(Figures[High(Figures)].DPoints)+1);
-  Figures[High(Figures)].DPoints[High( Figures[High(Figures)].DPoints)]:=ADoublePoint;
-  SetLength(Figures[High(Figures)].DPoints, length(Figures[High(Figures)].DPoints)+1);
-  Figures[High(Figures)].DPoints[High( Figures[High(Figures)].DPoints)]:=ADoublePoint;
+  inherited;
 end;
 
 procedure TRoundRectTool.MouseMove(APoint:TPoint);
 begin
-  ADoublePoint:=Canvas2Wrld(APoint);
-  Figures[High(Figures)].DPoints[High( Figures[High(Figures)].DPoints)]:=ADoublePoint;
+  inherited;
 end;
 
 procedure TRoundRectTool.MouseUp(APoint:TPoint);
@@ -429,20 +404,10 @@ var
   TL,BR:TPoint;
 begin
   if not rBtnPressed then begin
-    ADoublePoint:=Canvas2Wrld(APoint);
     SetLength(Figures, Length(Figures) + 1);
     Figures[High(Figures)] := TSelect.Create;
-
-    SetLength(ADPoints,Length(ADPoints)+1);
-    ADPoints[high(ADPoints)]:=ADoublePoint;
-    SetLength(ADPoints,Length(ADPoints)+1);
-    ADPoints[high(ADPoints)]:=ADoublePoint;
-
-    SetLength(Figures[High(Figures)].DPoints, length(Figures[High(Figures)].DPoints)+1);
-    Figures[High(Figures)].DPoints[High( Figures[High(Figures)].DPoints)]:=ADoublePoint;
-    SetLength(Figures[High(Figures)].DPoints, length(Figures[High(Figures)].DPoints)+1);
-    Figures[High(Figures)].DPoints[High( Figures[High(Figures)].DPoints)]:=ADoublePoint;
-
+    inherited;
+    ADPoints:=Figures[High(Figures)].DPoints;
   end
   else if rBtnPressed  then begin
     FirstP:=APoint;
@@ -464,12 +429,10 @@ end;
 procedure TSelectTool.MouseMove(APoint:TPoint);
 var
   i:integer;
-  S:string;
 begin
-  ADoublePoint:=Canvas2Wrld(APoint);
   if not rBtnPressed then begin
     ADPoints[high(ADPoints)]:=ADoublePoint;
-    Figures[High(Figures)].DPoints[High( Figures[High(Figures)].DPoints)]:=ADoublePoint;
+    inherited;
   end
   else if not Transp.transporate then begin
     for iFigure in Figures do begin
@@ -483,7 +446,6 @@ begin
        end;
       end;
     end;
-
   end
   else begin
   for iFigure in Figures do begin
@@ -497,10 +459,7 @@ begin
 end;
 
 procedure TSelectTool.MouseUp(APoint:TPoint);
-var
-  i:integer;
 begin
-
   if (Length(ADPoints)) = 2 then
     if (abs(ADPoints[0].x - ADPoints[1].x) < 2) and
        (abs(ADPoints[0].y - ADPoints[1].y) < 2) then
@@ -519,7 +478,7 @@ begin
     SetLength(ADPoints, length(ADPoints) - 2);
     end;
 
-  if Figures[High(Figures)].ClassName = 'TSelect' then
+ if (Length(Figures)<>0) and (Figures[High(Figures)].ClassName = 'TSelect') then
     SetLength(Figures, length(Figures) - 1);
   if rBtnPressed then begin
     rBtnPressed:=false;
@@ -570,23 +529,6 @@ begin
   AParam.CreateDeleteButton(Apanel,@AParam.DeleteFigure);
 
 end;
-
-{procedure DeleteFigure;
-var
-  i, j: integer;
-begin
-  j := 0;
-
-  for i := 0 to high(Figures) do
-    if (Figures[i].Selected) then
-      FreeAndNil(Figures[i])
-    else begin
-      Figures[j] := Figures[i];
-      inc(j);
-    end;
-
-  SetLength(Figures, j);
-end; }
 
 procedure LayerDown;
 var

@@ -45,7 +45,6 @@ var
   BrushStyle: RBrushStyle;
   PenStyle: RPenStyle;
   PenWidthInt: integer;
-
   RoundX: integer;
   RoundY: integer;
 

@@ -26,7 +26,6 @@ type
     LTop,RBottom:TDoublePoint;
     MinPoint,MaxPoint:TDoublePoint;
     DPoints:Array of TDoublePoint;
-    APoints:Array of TPoint;
     procedure Draw(ACanvas:TCanvas);virtual;
     procedure CheckPtIn(APoint:TPoint);virtual;
     procedure CheckRect(FirstPoint, LastPoint:TPoint);virtual;
@@ -85,14 +84,12 @@ type
 var
   Figures: Array of TFigure;
   REDOFigures: Array of TFigure;
-  AFirstPoint:TPoint;
 
 implementation
 
 procedure TFigure.DrawOutline(Point1,Point2: TDoublePoint; Canvas: TCanvas);
 var
   a:TDoublepoint;
-  k,i:integer;
 begin
   if (Point1.X>Point2.X) then
     begin

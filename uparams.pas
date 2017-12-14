@@ -40,6 +40,7 @@ type
     RoundedX: integer;
     RoundedY: integer;
     PWidth: integer;
+    iFigure:TFigure;
     procedure DeleteFigure(Sender:TObject);
     procedure SelectedPenColorButtonChanged(Sender: TObject);
     procedure PenColorButtonChanged(Sender: TObject);
@@ -63,7 +64,6 @@ type
 var
   TypeBrushStyle: RBrushStyle;
   TypePenStyle: RPenStyle;
-  iFigure:TFigure;
   UPDpb:TPaintBox;
 implementation
 

@@ -15,6 +15,7 @@ type
 { TMainForm }
 
   TMainForm = class(TForm)
+
     FLoatSpinZoom: TFloatSpinEdit;
     MainMenu: TMainMenu;
     MenuExit: TMenuItem;
@@ -33,6 +34,8 @@ type
     ToolsPanel: TPanel;
     Pb: TPaintBox;
 
+    procedure BtnUndoCreate;
+    procedure BtnRedoCreate;
     procedure BitUNDOClick(Sender: TObject);
     procedure BitREDOClick(Sender: TObject);
     procedure FLoatSpinZoomChange(Sender: TObject);
@@ -62,20 +65,18 @@ type
 
 
   private
+     panelchange:boolean;
+     isDrawing:boolean;
     { private declarations }
   public
+
     { public declarations }
   end;
 const
   FiguresName: Array[0..4] of TFigureClass = (TRectangle,TLine,TPenLine,TRoundRect,TEllipse);
 var
   MainForm: TMainForm;
-  isDrawing:boolean;
   ATool: TTool;
-  ParameterTool: TPanel;
-  CWidth,CHeight:Integer;
-  Toolbar: TPanel;
-  panelchange:boolean;
 
 implementation
 
@@ -97,7 +98,7 @@ begin
   PPanel.Height:=330;
   PPanel.Top:=250;
   PPanel.Left:=0;
-  WritePL:=false;
+  ATool.WritePL:=false;
   ATool.AfterConstruction;
   ATool.ParPanel:=PPanel;
   ATool.PPanelCreate(PPanel);
@@ -126,42 +127,46 @@ var
  load:TextFile;
  S,S1,S2,buf:String;
  i,j,k:integer;
- iFigure:TFigure;
 begin
   if OpenD.Execute then begin
-    SetLength(Figures,0);
-    FreeAndNil(Figures);
     AssignFile(load,OpenD.FileName);
     Reset(load);
+    Read(load,S2);
     while not EOF(load) do begin
       Readln(load,buf);
       S:=S+buf;
       JS:=SO(S);
     end;
     closefile(load);
-    JSA:=(JS.A['TFigures.Figure']);
-    for i:=0 to JSA.Length-1 do begin
-      SetLength(Figures,Length(Figures)+1);
-      S1:= SO(JSA.S[i]).S['name'];
-      for j:=0 to Length(FiguresName)-1 do begin
-        if FiguresName[j].ClassName=S1 then
-          Figures[i]:=FiguresName[j].Create;
+    if S2='RedactoriA@1.0' then begin
+      SetLength(Figures,0);
+      FreeAndNil(Figures);
+      JSA:=(JS.A['TFigures.Figure']);
+      for i:=0 to JSA.Length-1 do begin
+        SetLength(Figures,Length(Figures)+1);
+        S1:= SO(JSA.S[i]).S['name'];
+        for j:=0 to Length(FiguresName)-1 do begin
+          if FiguresName[j].ClassName=S1 then
+            Figures[i]:=FiguresName[j].Create;
+        end;
+        Figures[i].PWidth:=SO(JSA.S[i]).i['PenWidth'];
+        Figures[i].PStyleInd:=SO(JSA.S[i]).i['PenStyleInd'];
+        Figures[i].PStyle:=TypePenStyle.Style[Figures[i].PStyleInd];
+        Figures[i].PColor:=(SO(JSA.S[i]).i['PenColor']);
+        Figures[i].BColor:=(SO(JSA.S[i]).i['BrushColor']);
+        Figures[i].BStyleInd:=SO(JSA.S[i]).i['BrushStyleInd'];
+        Figures[i].BStyle:=TypeBrushStyle.Style[Figures[i].BStyleInd];
+        JSA1:=SO(JSA.S[i]).A['coord'];
+        k:=0;
+        for j:=0 to (JSA1.Length div 2)-1 do begin
+          SetLength(Figures[i].DPoints, Length(Figures[i].DPoints)+1);
+          Figures[i].DPoints[high(Figures[i].DPoints)]:=Canvas2Wrld(Point(JSA1.i[k],JSA1.i[k+1]));
+          K:=k+2;
+        end;
       end;
-      Figures[i].PWidth:=SO(JSA.S[i]).i['PenWidth'];
-      Figures[i].PStyleInd:=SO(JSA.S[i]).i['PenStyleInd'];
-      Figures[i].PStyle:=TypePenStyle.Style[Figures[i].PStyleInd];
-      Figures[i].PColor:=(SO(JSA.S[i]).i['PenColor']);
-      Figures[i].BColor:=(SO(JSA.S[i]).i['BrushColor']);
-      Figures[i].BStyleInd:=SO(JSA.S[i]).i['BrushStyleInd'];
-      Figures[i].BStyle:=TypeBrushStyle.Style[Figures[i].BStyleInd];
-      JSA1:=SO(JSA.S[i]).A['coord'];
-      k:=0;
-      for j:=0 to (JSA1.Length div 2)-1 do begin
-        SetLength(Figures[i].DPoints, Length(Figures[i].DPoints)+1);
-        Figures[i].DPoints[high(Figures[i].DPoints)]:=Canvas2Wrld(Point(JSA1.i[k],JSA1.i[k+1]));
-        K:=k+2;
-      end;
-    end;
+   end
+   else
+     ShowMessage('Unsupported format');
   end;
 end;
 
@@ -176,6 +181,7 @@ begin
   if SaveD.Execute then begin
     AssignFile(save,SaveD.FileName);
     Rewrite(save);
+    writeln(save,'RedactoriA@1.0');
     writeln(save,'{"TFigures":');
     writeln(save,'  {');
     write(save,'    "Figure":');
@@ -276,22 +282,10 @@ begin
   Offset:= Point(0,0);
   isDrawing:=false;
   UPDpb:=Pb;
-  AButton:=TBitBtn.Create(Self);
-  AButton.Caption:='UNDO';
-  AButton.Width := ToolsPanel.Width div 2;
-  AButton.Height := 50;
-  AButton.Top := 0;
-  AButton.Parent := ToolsPanel;
-  AButton.onClick := @BitUNDOClick;
 
-  AButton:=TBitBtn.Create(Self);
-  AButton.Caption:='REDO';
-  AButton.Width := ToolsPanel.Width div 2;
-  AButton.Left := ToolsPanel.Width div 2;
-  AButton.Height := 50;
-  AButton.Top := 0;
-  AButton.Parent := ToolsPanel;
-  AButton.onClick := @BitREDOClick;
+  BtnUndoCreate;
+  BtnRedoCreate;
+
   for i:=0 to High(Tools) do
   begin
     AButton := TBitBtn.Create(ToolsPanel);
@@ -312,6 +306,32 @@ begin
 
 end;
 
+procedure TMainForm.BtnUndoCreate;
+var
+  AButton: TBitBtn;
+begin
+  AButton:=TBitBtn.Create(Self);
+  AButton.Caption:='UNDO';
+  AButton.Width := ToolsPanel.Width div 2;
+  AButton.Height := 50;
+  AButton.Top := 0;
+  AButton.Parent := ToolsPanel;
+  AButton.onClick := @BitUNDOClick;
+end;
+
+procedure TMainForm.BtnRedoCreate;
+var
+  AButton: TBitBtn;
+begin
+  AButton:=TBitBtn.Create(Self);
+  AButton.Caption:='REDO';
+  AButton.Width := ToolsPanel.Width div 2;
+  AButton.Left := ToolsPanel.Width div 2;
+  AButton.Height := 50;
+  AButton.Top := 0;
+  AButton.Parent := ToolsPanel;
+  AButton.onClick := @BitREDOClick;
+end;
 
 procedure TMainForm.BitUNDOClick(Sender: TObject);
 begin
@@ -349,11 +369,11 @@ begin
       Atool.rBtnPressed:= not Atool.rBtnPressed;
       ATool.MouseDown(Point(X,Y));
       isDrawing := true;
-      WritePL:=false;
+      ATool.WritePL:=false;
     end;
   if ssLeft in Shift then begin
     isDrawing := true;
-    if not WritePL then
+    if not ATool.WritePL then
       ATool.MouseDown(Point(X,Y))
     else
       ATool.MouseMove(Point(X,Y));
@@ -364,7 +384,7 @@ end;
 procedure TMainForm.PbMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer
   );
 begin
-  if (isDrawing) and (not WritePL)then  begin
+  if (isDrawing) and (not ATool.WritePL)then  begin
     ATool.MouseMove(Point(X,Y));
   end;
   Invalidate;
