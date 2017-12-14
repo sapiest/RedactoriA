@@ -516,7 +516,7 @@ begin
     AParam.CreateSpinEdit(APanel, 'Pen Width', GPWidth, @AParam.SelectedPenWidthChange);
   end
   else if bigselected then begin
-    if ((GRoundedY or GRoundedX)<> 0) then begin
+    if (iFigure.ClassName='TRoundRect') then begin
       AParam.CreateSpinEdit(APanel, 'Round Y', GRoundedY, @AParam.SelectedRoundYChange);
       AParam.CreateSpinEdit(APanel, 'Round X', GRoundedX, @AParam.SelectedRoundXChange);
     end;

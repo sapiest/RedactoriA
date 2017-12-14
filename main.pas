@@ -160,7 +160,7 @@ begin
         k:=0;
         for j:=0 to (JSA1.Length div 2)-1 do begin
           SetLength(Figures[i].DPoints, Length(Figures[i].DPoints)+1);
-          Figures[i].DPoints[high(Figures[i].DPoints)]:=Canvas2Wrld(Point(JSA1.i[k],JSA1.i[k+1]));
+          Figures[i].DPoints[high(Figures[i].DPoints)]:=DoublePoint(JSA1.d[k],JSA1.d[k+1]);
           K:=k+2;
         end;
       end;
@@ -194,9 +194,9 @@ begin
         SetLength(Scoord,Length(Scoord)+1);
         Scoord[j]:=Figures[i].DPoints[j];
         if j=length(Figures[i].DPoints)-1 then
-          write(save,FloatToStr(Scoord[j].x)+','+FloatToStr(Scoord[j].y))
+          write(save,Scoord[j].x, ',', Scoord[j].y)
         else
-          write(save,FloatToStr(Scoord[j].x)+','+FloatToStr(Scoord[j].y)+',');
+          write(save,Scoord[j].x,',',Scoord[j].y,',');
       end;
       write(save,'],');
       write(save,'"PenWidth":'+IntToStr(Figures[i].PWidth)+',');
