@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils,Graphics,UFigure,Dialogs, ExtCtrls, UScale, Controls, Spin, StdCtrls, Buttons,
   UParams, LCLType, FPCanvas, TypInfo, LCL, LCLIntf, Math,
-  FileUtil, Forms,
+  FileUtil, Forms,fpjson, superobject,
   Menus
   ;
 type
@@ -128,12 +128,89 @@ end;
 
   procedure LayerDown;
   procedure LayerUp;
-
+  function SaveFile:string;
+  function LoadFile(S:string):string;
+const
+  FiguresName: Array[0..4] of TFigureClass = (TRectangle,TLine,TPenLine,TRoundRect,TEllipse);
 var
   Tools: array of TTool;
   AParam: TParam;
 
 implementation
+
+function LoadFile(S:string):string;
+var
+ JS,JS1: ISuperObject;
+ JSA,JSA1:TSuperArray;
+ load:TextFile;
+ S1,buf:String;
+ i,j,k:integer;
+begin
+    JS:=SO(S);
+      SetLength(Figures,0);
+      FreeAndNil(Figures);
+      JSA:=(JS.A['TFigures']);
+      for i:=0 to JSA.Length-1 do begin
+        SetLength(Figures,Length(Figures)+1);
+        S1:= SO(JSA.S[i]).S['name'];
+        for j:=0 to Length(FiguresName)-1 do begin
+          if FiguresName[j].ClassName=S1 then
+            Figures[i]:=FiguresName[j].Create;
+        end;
+        JS1:=SO(JSA.S[i]);
+        Figures[i].PWidth:=JS1.i['PenWidth'];
+        Figures[i].PStyleInd:=JS1.i['PenStyleInd'];
+        Figures[i].PStyle:=TypePenStyle.Style[Figures[i].PStyleInd];
+        Figures[i].PColor:=JS1.i['PenColor'];
+        Figures[i].BColor:=JS1.i['BrushColor'];
+        Figures[i].BStyleInd:=JS1.i['BrushStyleInd'];
+        Figures[i].BStyle:=TypeBrushStyle.Style[Figures[i].BStyleInd];
+        Figures[i].RoundedX:=JS1.i['RoundedX'];
+        Figures[i].RoundedY:=JS1.i['RoundedY'];
+        JSA1:=SO(JSA.S[i]).A['coord'];
+        k:=0;
+        for j:=0 to (JSA1.Length div 2)-1 do begin
+
+          SetLength(Figures[i].DPoints, Length(Figures[i].DPoints)+1);
+          Figures[i].DPoints[high(Figures[i].DPoints)]:=DoublePoint(JSA1.d[k],JSA1.d[k+1]);
+          K:=k+2;
+        end;
+     end;
+end;
+
+function SaveFile:String;
+var
+  i, j, k:integer;
+  jObject, jFigure, jCoord : TJSONObject;
+  jArray, jSecArray: TJSONArray;
+  S:string;
+  FName: String;
+begin
+  jObject := TJSONObject.Create;
+  jObject.Add('RedactoriA@',1);
+  jObject.Add('TFigures', TJSONArray.Create);
+  for i:= 0 to High(Figures) do
+  begin
+    jFigure := TJSONObject.Create;
+    jFigure.Add('name', Figures[i].ClassName);
+    jFigure.Add('coord',TJSONArray.Create);
+    for j := 0 to high(Figures[i].Dpoints) do begin
+      jFigure.Arrays['coord'].Add(Figures[i].Dpoints[j].x);
+      jFigure.Arrays['coord'].Add(Figures[i].Dpoints[j].y);
+    end;
+    jFigure.Add('PenColor', Figures[i].PColor);
+    jFigure.Add('PenStyleInd',  Figures[i].PStyleInd);
+    jFigure.Add('PenWidth',Figures[i].PWidth);
+    jFigure.Add('BrushColor', Figures[i].BColor);
+    jFigure.Add('BrushStyleInd', Figures[i].BStyleInd);
+    jFigure.Add('RoundedX',Figures[i].RoundedX);
+    jFigure.Add('RoundedY',Figures[i].RoundedY);
+    jObject.Arrays['TFigures'].Add(jFigure);
+  end;
+  S:=jObject.FormatJSON;
+  ShowMessage(S);
+  Result:=S;
+end;
 
 procedure TTool.MouseDown(Apoint:TPoint);
 begin
@@ -516,7 +593,7 @@ begin
     AParam.CreateSpinEdit(APanel, 'Pen Width', GPWidth, @AParam.SelectedPenWidthChange);
   end
   else if bigselected then begin
-    if (GRoundedY or GRoundedX)<> 0 then begin
+    if (iFigure.ClassName='TRoundRect') then begin
       AParam.CreateSpinEdit(APanel, 'Round Y', GRoundedY, @AParam.SelectedRoundYChange);
       AParam.CreateSpinEdit(APanel, 'Round X', GRoundedX, @AParam.SelectedRoundXChange);
     end;
