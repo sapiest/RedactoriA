@@ -40,7 +40,6 @@ type
     RoundedX: integer;
     RoundedY: integer;
     PWidth: integer;
-    iFigure:TFigure;
     procedure DeleteFigure(Sender:TObject);
     procedure SelectedPenColorButtonChanged(Sender: TObject);
     procedure PenColorButtonChanged(Sender: TObject);
@@ -84,6 +83,8 @@ begin
 end;
 
 procedure TParam.SelectedPenColorButtonChanged(Sender: TObject);
+var
+  iFigure:TFigure;
 begin
   for iFigure in Figures do
     if iFigure.Selected then
@@ -97,6 +98,8 @@ begin
 end;
 
 procedure TParam.SelectedBrushColorButtonChanged(Sender: TObject);
+var
+  iFigure:TFigure;
 begin
   for iFigure in Figures do
     if iFigure.Selected then
@@ -115,6 +118,8 @@ begin
 end;
 
 procedure TParam.SelectedPenWidthChange(Sender: TObject);
+var
+  iFigure:TFigure;
 begin
   for iFigure in Figures do
     if iFigure.Selected then
@@ -123,6 +128,8 @@ begin
 end;
 
 procedure TParam.SelectedBrushStyleChange(Sender: TObject);
+var
+  iFigure:TFigure;
 begin
    for iFigure in Figures do
     if iFigure.Selected then begin
@@ -139,6 +146,8 @@ begin
 end;
 
 procedure TParam.SelectedPenStyleChange(Sender: TObject);
+var
+  iFigure:TFigure;
 begin
   for iFigure in Figures do
     if iFigure.Selected then begin
@@ -155,6 +164,8 @@ begin
 end;
 
 procedure TParam.SelectedRoundXChange(Sender: TObject);
+var
+  iFigure:TFigure;
 begin
    for iFigure in Figures do
     if iFigure.Selected then
@@ -168,6 +179,8 @@ begin
 end;
 
 procedure TParam.SelectedRoundYChange(Sender: TObject);
+var
+  iFigure:TFigure;
 begin
    for iFigure in Figures do
     if iFigure.Selected then

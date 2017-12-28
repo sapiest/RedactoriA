@@ -84,7 +84,6 @@ type
 var
   Figures: Array of TFigure;
   REDOFigures: Array of TFigure;
-  //AFirstPoint:TPoint;
 
 implementation
 

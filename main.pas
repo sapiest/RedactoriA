@@ -135,7 +135,7 @@ begin
       S:=S+buf;
     end;
     closefile(load);
-    LoadFile(S);;
+    LoadFile(S);
     Invalidate;
   end;
 end;
@@ -196,11 +196,19 @@ procedure TMainForm.FormKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
   if (key=Ord('Z')) and (ssCtrl in Shift) and (isDrawing=false)then begin
-     ATool.WriteUNDOFigures;
+     WriteUNDOFigures;
      pb.Invalidate;
   end;
   if (key=Ord('Y')) and (ssCtrl in Shift) and (isDrawing=false)then begin
-     ATool.WriteREDOFigures;
+     WriteREDOFigures;
+     pb.Invalidate;
+  end;
+  if (key=Ord('C')) and (ssCtrl in Shift) and (isDrawing=false)then begin
+     CopyFigure;
+     pb.Invalidate;
+  end;
+  if (key=Ord('V')) and (ssCtrl in Shift) and (isDrawing=false)then begin
+     PasteFigure;
      pb.Invalidate;
   end;
   if (key=VK_ADD)      or (key=VK_OEM_PLUS)  then
@@ -258,6 +266,7 @@ begin
   AButton.Top := 0;
   AButton.Parent := ToolsPanel;
   AButton.onClick := @BitUNDOClick;
+  CreateStack(UndoStack);
 end;
 
 procedure TMainForm.BtnRedoCreate;
@@ -272,17 +281,18 @@ begin
   AButton.Top := 0;
   AButton.Parent := ToolsPanel;
   AButton.onClick := @BitREDOClick;
+  CreateStack(RedoStack);
 end;
 
 procedure TMainForm.BitUNDOClick(Sender: TObject);
 begin
-    ATool.WriteUNDOFigures;
+    WriteUNDOFigures;
   pb.Invalidate;
 end;
 
 procedure TMainForm.BitREDOClick(Sender: TObject);
 begin
-    ATool.WriteREDOFigures;
+    WriteREDOFigures;
   pb.Invalidate;
 end;
 
@@ -304,7 +314,7 @@ end;
 procedure TMainForm.PbMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
-  ATool.CleanREDOFigures;
+  CleanREDOFigures;
   if ssRight in Shift then
     if ATool.ClassName='TSelectTool' then begin
       Atool.rBtnPressed:= not Atool.rBtnPressed;
