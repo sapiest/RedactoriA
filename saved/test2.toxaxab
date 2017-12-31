@@ -1,0 +1,8 @@
+RedactoriA@1.0
+{"TFigures":
+  {
+    "Figure":[
+    {"name":"TRoundRect","coord":[ 7.8000000000000000E+001, 1.9400000000000000E+002, 2.3000000000000000E+002, 3.9200000000000000E+002],"PenWidth":1,"PenStyleInd":5,"PenColor":0,"BrushColor":16777215,"RoundedX":24,"RoundedY":100,"BrushStyleInd":6},
+    {"name":"TRectangle","coord":[ 9.9000000000000000E+001, 4.3000000000000000E+001, 2.2200000000000000E+002, 1.6500000000000000E+002],"PenWidth":1,"PenStyleInd":5,"PenColor":0,"BrushColor":16777215,"RoundedX":24,"RoundedY":100,"BrushStyleInd":6}]
+  }
+}

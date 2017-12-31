@@ -1,7 +1,7 @@
 object MainForm: TMainForm
-  Left = 977
+  Left = 224
   Height = 650
-  Top = 83
+  Top = 145
   Width = 723
   Caption = 'RedactoriA'
   ClientHeight = 630
@@ -48,6 +48,8 @@ object MainForm: TMainForm
     Width = 623
     Align = alClient
     Anchors = [akRight]
+    Color = clNone
+    ParentColor = False
     OnMouseDown = PbMouseDown
     OnMouseMove = PbMouseMove
     OnMouseUp = PbMouseUp
@@ -79,17 +81,30 @@ object MainForm: TMainForm
   object MainMenu: TMainMenu
     object MenuFile: TMenuItem
       Caption = 'Файл'
-      object MenuItem2: TMenuItem
-        Caption = 'Вверх'
-        OnClick = MenuItem2Click
+      OnClick = MenuFileClick
+      object MenuItemSave: TMenuItem
+        Caption = 'Сохранить'
+        OnClick = MenuItemSaveClick
       end
-      object MenuItem1: TMenuItem
-        Caption = 'Вниз'
-        OnClick = MenuItem1Click
+      object MenuItemLoad: TMenuItem
+        Caption = 'Загрузить'
+        OnClick = MenuItemLoadClick
       end
       object MenuExit: TMenuItem
         Caption = 'Выход'
         OnClick = MenuExitClick
+      end
+    end
+    object MenuItem3: TMenuItem
+      Caption = 'Свойства'
+      OnClick = MenuItem3Click
+      object MenuItemUp: TMenuItem
+        Caption = 'Вверх'
+        OnClick = MenuItemUpClick
+      end
+      object MenuItemDown: TMenuItem
+        Caption = 'Вниз'
+        OnClick = MenuItemDownClick
       end
     end
     object MenuF1: TMenuItem
@@ -99,5 +114,16 @@ object MainForm: TMainForm
         OnClick = MenuAboutClick
       end
     end
+  end
+  object OpenD: TOpenDialog
+    DefaultExt = '.toxaxab'
+    Filter = 'Redactoria|*.toxaxab'
+    left = 48
+    top = 40
+  end
+  object SaveD: TSaveDialog
+    DefaultExt = '.toxaxab'
+    Filter = 'Redactoria|*.toxaxab'
+    left = 29
   end
 end

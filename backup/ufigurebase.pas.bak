@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils,Graphics,UFigure,Dialogs, ExtCtrls, UScale, Controls, Spin, StdCtrls, Buttons,
   UParams, LCLType, FPCanvas, TypInfo, LCL, LCLIntf, Math,
-  FileUtil, Forms,
+  FileUtil, Forms,fpjson, superobject, Clipbrd,
   Menus
   ;
 type
@@ -38,11 +38,10 @@ type
     procedure ClearSelect;
     procedure MouseDown(APoint:TPoint);virtual;
     procedure MouseMove(APoint:TPoint);virtual;
-    procedure MouseUp(APoint:TPoint);virtual;abstract;
+    procedure MouseUp();virtual;
 
     procedure PPanelCreate(APanel:TPanel);virtual;
     procedure MinMaxPoints;
-    procedure CleanREDOFigures;
     procedure WriteUNDOFigures;
     procedure WriteREDOFigures;
     procedure FiguresDraw(pb:TPaintBox);
@@ -53,7 +52,7 @@ end;
     FirstP:TPoint;
     procedure MouseDown(APoint:TPoint);override;
     procedure MouseMove(APoint:TPoint);override;
-    procedure MouseUp(APoint:TPoint);override;
+    procedure MouseUp();override;
     procedure PPanelCreate(APanel:TPanel);override;
   end;
 
@@ -61,49 +60,49 @@ end;
     FirstP:TPoint;
     procedure MouseDown(APoint:TPoint);override;
     procedure MouseMove(APoint:TPoint);override;
-    procedure MouseUp(APoint:TPoint);override;
+    procedure MouseUp();override;
     procedure PPanelCreate(APanel:TPanel);override;
   end;
 
   TPolyLineTool = class(TTool)
     procedure MouseDown(APoint:TPoint);override;
     procedure MouseMove(APoint:TPoint);override;
-    procedure MouseUp(APoint:TPoint);override;
+    procedure MouseUp();override;
     procedure PPanelCreate(APanel:TPanel);override;
   end;
 
   TLineTool = class(TTool)
     procedure MouseDown(APoint:TPoint);override;
     procedure MouseMove(APoint:TPoint);override;
-    procedure MouseUp(APoint:TPoint);override;
+    procedure MouseUp();override;
     procedure PPanelCreate(APanel:TPanel);override;
   end;
 
   TPenTool = class(TTool)
     procedure MouseDown(APoint:TPoint);override;
     procedure MouseMove(APoint:TPoint);override;
-    procedure MouseUp(APoint:TPoint);override;
+    procedure MouseUp();override;
     procedure PPanelCreate(APanel:TPanel);override;
   end;
 
   TRectangleTool = class(TTool)
     procedure MouseDown(APoint:TPoint);override;
     procedure MouseMove(APoint:TPoint);override;
-    procedure MouseUp(APoint:TPoint);override;
+    procedure MouseUp();override;
     procedure PPanelCreate(APanel:TPanel);override;
   end;
 
   TRoundRectTool = class(TTool)
     procedure MouseDown(APoint:TPoint);override;
     procedure MouseMove(APoint:TPoint);override;
-    procedure MouseUp(APoint:TPoint);override;
+    procedure MouseUp();override;
     procedure PPanelCreate(APanel:TPanel);override;
   end;
 
   TEllipseTool = class(TTool)
     procedure MouseDown(APoint:TPoint);override;
     procedure MouseMove(APoint:TPoint);override;
-    procedure MouseUp(APoint:TPoint);override;
+    procedure MouseUp();override;
     procedure PPanelCreate(APanel:TPanel);override;
   end;
 
@@ -122,18 +121,117 @@ end;
     ADPoints:Array of TDoublePoint;
     procedure MouseDown(APoint:TPoint);override;
     procedure MouseMove(APoint:TPoint);override;
-    procedure MouseUp(APoint:TPoint);override;
+    procedure MouseUp();override;
     procedure PPanelCreate(APanel:TPanel);override;
   end;
-
-  procedure LayerDown;
-  procedure LayerUp;
 
 var
   Tools: array of TTool;
   AParam: TParam;
 
 implementation
+
+procedure PasteFigure;
+begin
+  if Clipboard<>nil then
+    LoadFile(Clipboard.AsText);
+end;
+
+procedure CopyFigure;
+var
+  jObject:TJSONObject;
+  iFigure:TFigure;
+begin
+  jObject := TJSONObject.Create;
+  jObject.Add('TFigures',TJSONArray.Create);
+  for iFigure in Figures do begin
+    if iFigure.Selected then
+      SaveFigure(iFigure,jObject);
+  end;
+  Clipboard.AsText:=jObject.FormatJSON();
+end;
+
+procedure SaveFigure(iFigure:TFigure;jObject:TJSONObject);
+var
+  jFigure:TJSONObject;
+  j:integer;
+begin
+    jFigure:=TJSONObject.Create;
+    with iFigure do begin
+      jFigure.Add('name', ClassName);
+      jFigure.Add('coord',TJSONArray.Create);
+      for j := 0 to high(Dpoints) do begin
+           jFigure.Arrays['coord'].Add(Dpoints[j].x);
+           jFigure.Arrays['coord'].Add(Dpoints[j].y);
+      end;
+      jFigure.Add('PenColor', PColor);
+      jFigure.Add('PenStyleInd', PStyleInd);
+      jFigure.Add('PenWidth',PWidth);
+      jFigure.Add('BrushColor', BColor);
+      jFigure.Add('BrushStyleInd', BStyleInd);
+      jFigure.Add('RoundedX',RoundedX);
+      jFigure.Add('RoundedY',RoundedY);
+  end;
+  jObject.Arrays['TFigures'].Add(jFigure);
+end;
+
+function SaveFile:String;
+var
+  i:integer;
+  jObject: TJSONObject;
+begin
+  jObject := TJSONObject.Create;
+  jObject.Add('TFigures', TJSONArray.Create);
+  for i:= 0 to High(Figures) do
+  begin
+    SaveFigure(Figures[i],jObject);
+  end;
+  Result:=jObject.FormatJSON;
+end;
+
+procedure LoadFigure(JS:ISuperObject;iFigure:TFigure);
+var
+  JSA1:TSuperArray;
+  k,j:integer;
+begin
+   with iFigure do begin
+     PWidth:=JS.i['PenWidth'];
+     PStyleInd:=JS.i['PenStyleInd'];
+     PStyle:=TypePenStyle.Style[PStyleInd];
+     PColor:=JS.i['PenColor'];
+     BColor:=JS.i['BrushColor'];
+     BStyleInd:=JS.i['BrushStyleInd'];
+     BStyle:=TypeBrushStyle.Style[BStyleInd];
+     JSA1:=JS.A['coord'];
+     k:=0;
+     for j:=0 to (JSA1.Length div 2)-1 do begin
+       SetLength(DPoints, Length(DPoints)+1);
+       DPoints[high(DPoints)]:=DoublePoint(JSA1.d[k],JSA1.d[k+1]);
+       K:=k+2;
+     end;
+   end;
+end;
+
+procedure LoadFile(S:string);
+var
+ JS,JS1: ISuperObject;
+ JSA:TSuperArray;
+ j,i:integer;
+ S1:string;
+begin
+  JS:=SO(S);
+  JSA:=(JS.A['TFigures']);
+  for i:=0 to JSA.Length-1 do begin
+    SetLength(Figures,Length(Figures)+1);
+    S1:= SO(JSA.S[i]).S['name'];
+    for j:=0 to Length(FiguresName)-1 do begin
+      if FiguresName[j].ClassName=S1 then
+        Figures[High(Figures)]:=FiguresName[j].Create;
+    end;
+    JS1:=(SO(JSA.S[i]));
+    LoadFigure(JS1,Figures[High(Figures)]);
+  end;
+end;
 
 procedure TTool.MouseDown(Apoint:TPoint);
 begin
@@ -148,6 +246,10 @@ procedure TTool.MouseMove(Apoint:TPoint);
 begin
   ADoublePoint:=Canvas2Wrld(APoint);
   Figures[High(Figures)].DPoints[High(Figures[High(Figures)].DPoints)]:=ADoublePoint;
+end;
+
+procedure TTool.MouseUp();
+begin
 end;
 
 procedure TTool.ClearSelect;
@@ -243,7 +345,7 @@ begin
   FirstP:=APoint;
 end;
 
-procedure THandTool.MouseUp(APoint:TPoint);
+procedure THandTool.MouseUp();
 begin
 
 end;
@@ -265,9 +367,9 @@ begin
   inherited;
 end;
 
-procedure TLineTool.MouseUp(APoint:TPoint);
+procedure TLineTool.MouseUp();
 begin
-
+  inherited;
 end;
 
 procedure TLineTool.PPanelCreate(APanel: TPanel);
@@ -289,9 +391,9 @@ begin
   inherited;
 end;
 
-procedure TPolyLineTool.MouseUp(APoint:TPoint);
+procedure TPolyLineTool.MouseUp();
 begin
-
+  inherited;
 end;
 
 procedure TPolyLineTool.PPanelCreate(APanel: TPanel);
@@ -312,9 +414,9 @@ begin
   inherited;
 end;
 
-procedure TPenTool.MouseUp(APoint:TPoint);
+procedure TPenTool.MouseUp();
 begin
-
+  inherited;
 end;
 
 procedure TPenTool.PPanelCreate(APanel:TPanel);
@@ -334,9 +436,9 @@ begin
   inherited;
 end;
 
-procedure TRectangleTool.MouseUp(APoint:TPoint);
+procedure TRectangleTool.MouseUp();
 begin
-
+  inherited;
 end;
 
 procedure TRectangleTool.PPanelCreate (APanel: TPanel);
@@ -358,9 +460,9 @@ begin
   inherited;
 end;
 
-procedure TEllipseTool.MouseUp(APoint:TPoint);
+procedure TEllipseTool.MouseUp();
 begin
-
+  inherited;
 end;
 
 procedure TEllipseTool.PPanelCreate(APanel: TPanel);
@@ -382,9 +484,9 @@ begin
   inherited;
 end;
 
-procedure TRoundRectTool.MouseUp(APoint:TPoint);
+procedure TRoundRectTool.MouseUp();
 begin
-
+  inherited;
 end;
 
 procedure TRoundRectTool.PPanelCreate(APanel: TPanel);
@@ -435,17 +537,17 @@ begin
     inherited;
   end
   else if not Transp.transporate then begin
-    for iFigure in Figures do begin
-    if iFigure.Selected then begin
-      if (iFigure.CheckRectangle(Wrld2Canvas(iFigure.LTop),Wrld2Canvas(iFigure.RBottom),FirstP)) then begin
-      for i:=0 to Length(iFigure.DPoints)-1 do begin
-         iFigure.DPoints[i].x += round((APoint.x - FirstP.x)/Zoom);
-         iFigure.DPoints[i].y += round((APoint.y - FirstP.y)/Zoom);
-       end;
-       FirstP:=APoint;
-       end;
-      end;
+  for iFigure in Figures do begin
+  if iFigure.Selected then begin
+    if (iFigure.CheckRectangle(Wrld2Canvas(iFigure.LTop),Wrld2Canvas(iFigure.RBottom),FirstP)) then begin
+    for i:=0 to High(iFigure.DPoints) do begin
+       iFigure.DPoints[i].x += ((APoint.x - FirstP.x)/Zoom);
+       iFigure.DPoints[i].y += ((APoint.y - FirstP.y)/Zoom);
+     end;
+     FirstP:=APoint;
+     end;
     end;
+  end;
   end
   else begin
   for iFigure in Figures do begin
@@ -458,7 +560,7 @@ begin
   end;
 end;
 
-procedure TSelectTool.MouseUp(APoint:TPoint);
+procedure TSelectTool.MouseUp();
 begin
   if (Length(ADPoints)) = 2 then
     if (abs(ADPoints[0].x - ADPoints[1].x) < 2) and
@@ -483,9 +585,8 @@ begin
   if rBtnPressed then begin
     rBtnPressed:=false;
     Transp.transporate:=false;
+    FirstP.Zero;
   end;
-
-
 end;
 
 procedure TSelectTool.PPanelCreate(APanel: TPanel);
@@ -516,7 +617,7 @@ begin
     AParam.CreateSpinEdit(APanel, 'Pen Width', GPWidth, @AParam.SelectedPenWidthChange);
   end
   else if bigselected then begin
-    if (GRoundedY or GRoundedX)<> 0 then begin
+    if ((GRoundedY or GRoundedX)<> 0) then begin
       AParam.CreateSpinEdit(APanel, 'Round Y', GRoundedY, @AParam.SelectedRoundYChange);
       AParam.CreateSpinEdit(APanel, 'Round X', GRoundedX, @AParam.SelectedRoundXChange);
     end;
@@ -572,8 +673,6 @@ begin
     Figures[i] := Buff[i - j];
 end;
 
-
-
 procedure TMagnifierTool.MouseDown(APoint:TPoint);
 begin
   //FirstP:=APoint;
@@ -584,7 +683,7 @@ begin
 
 end;
 
-procedure TMagnifierTool.MouseUp(APoint:TPoint);
+procedure TMagnifierTool.MouseUp();
 const
   ZoomStep=1;
 begin
@@ -616,28 +715,21 @@ begin
 
 end;
 
-
-procedure TTool.CleanREDOFigures;
-begin
-  SetLength(REDOFigures,0);
-end;
-
 procedure TTool.writeUNDOFigures;
 begin
-  if Length(Figures) > 0 then begin
-    SetLength(REDOFigures,Length(REDOFigures)+1);
-    REDOFigures[High(REDOFigures)]:=Figures[High(Figures)];
-    SetLength(Figures,High(Figures));
+  if not isEmpty(UndoRedoL) then begin
+    //ShowMessage(UndoRedoL.Data[UndoRedoL.Data.Count-1]);
+    //ShowMessage(IntToStr(UndoRedoL.Current));
+    //ShowMessage(Undo(UndoRedoL));
+    SetLength(Figures,0);
+    LoadFile(Undo(UndoRedoL));
   end;
 end;
 
 procedure TTool.WriteREDOFigures;
 begin
-  if Length(REDOFigures)>0 then begin
-     SetLength(Figures,Length(Figures)+1);
-     Figures[High(Figures)]:=REDOFigures[High(REDOFigures)];
-     SetLength(REDOFigures,High(REDOFigures));
-  end;
+  if not isEmpty(UndoRedoL) then
+    LoadFile(Redo(UndoRedoL));
 end;
 
 procedure TTool.FiguresDraw(pb:TPaintBox);

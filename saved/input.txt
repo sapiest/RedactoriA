@@ -1,0 +1,9 @@
+{"TFigures":
+  {
+      "Figure" : [
+	   {"name":"TRectangle", "coord":[-222,222]},
+	   {"name":"TLine", "coord":[111,0]},
+	   {"name":"TEllipse", "coord":[100,333]}
+	  ]
+  }
+}

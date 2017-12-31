@@ -72,8 +72,7 @@ type
 
     { public declarations }
   end;
-const
-  FiguresName: Array[0..4] of TFigureClass = (TRectangle,TLine,TPenLine,TRoundRect,TEllipse);
+
 var
   MainForm: TMainForm;
   ATool: TTool;
@@ -131,86 +130,25 @@ begin
   if OpenD.Execute then begin
     AssignFile(load,OpenD.FileName);
     Reset(load);
-    Read(load,S2);
     while not EOF(load) do begin
       Readln(load,buf);
       S:=S+buf;
-      JS:=SO(S);
     end;
     closefile(load);
-    if S2='RedactoriA@1.0' then begin
-      SetLength(Figures,0);
-      FreeAndNil(Figures);
-      JSA:=(JS.A['TFigures.Figure']);
-      for i:=0 to JSA.Length-1 do begin
-        SetLength(Figures,Length(Figures)+1);
-        S1:= SO(JSA.S[i]).S['name'];
-        for j:=0 to Length(FiguresName)-1 do begin
-          if FiguresName[j].ClassName=S1 then
-            Figures[i]:=FiguresName[j].Create;
-        end;
-        Figures[i].PWidth:=SO(JSA.S[i]).i['PenWidth'];
-        Figures[i].PStyleInd:=SO(JSA.S[i]).i['PenStyleInd'];
-        Figures[i].PStyle:=TypePenStyle.Style[Figures[i].PStyleInd];
-        Figures[i].PColor:=(SO(JSA.S[i]).i['PenColor']);
-        Figures[i].BColor:=(SO(JSA.S[i]).i['BrushColor']);
-        Figures[i].BStyleInd:=SO(JSA.S[i]).i['BrushStyleInd'];
-        Figures[i].BStyle:=TypeBrushStyle.Style[Figures[i].BStyleInd];
-        JSA1:=SO(JSA.S[i]).A['coord'];
-        k:=0;
-        for j:=0 to (JSA1.Length div 2)-1 do begin
-          SetLength(Figures[i].DPoints, Length(Figures[i].DPoints)+1);
-          Figures[i].DPoints[high(Figures[i].DPoints)]:=DoublePoint(JSA1.d[k],JSA1.d[k+1]);
-          K:=k+2;
-        end;
-      end;
-   end
-   else
-     ShowMessage('Unsupported format');
+    SetLength(Figures,0);
+    LoadFile(S);
   end;
 end;
 
 procedure TMainForm.MenuItemSaveClick(Sender: TObject);
 var
- obj:TSuperObject;
  save:TextFile;
- i,j:integer;
- Sname:String;
- Scoord:Array of TDoublePoint;
 begin
   if SaveD.Execute then begin
     AssignFile(save,SaveD.FileName);
     Rewrite(save);
-    writeln(save,'RedactoriA@1.0');
-    writeln(save,'{"TFigures":');
-    writeln(save,'  {');
-    write(save,'    "Figure":');
-    writeln(save,'[');
-    for i:=0 to Length(Figures)-1 do begin
-      Sname:=Figures[i].ClassName;
-      write(save,'    {"name":'+'"'+Sname+'",');
-      write(save,'"coord":[');
-      for j:=0 to length(Figures[i].DPoints)-1 do begin
-        SetLength(Scoord,Length(Scoord)+1);
-        Scoord[j]:=Figures[i].DPoints[j];
-        if j=length(Figures[i].DPoints)-1 then
-          write(save,Scoord[j].x, ',', Scoord[j].y)
-        else
-          write(save,Scoord[j].x,',',Scoord[j].y,',');
-      end;
-      write(save,'],');
-      write(save,'"PenWidth":'+IntToStr(Figures[i].PWidth)+',');
-      write(save,'"PenStyleInd":'+IntToStr(Figures[i].PStyleInd)+',');
-      write(save,'"PenColor":'+IntToStr(ColorToRGB(Figures[i].PColor))+',');
-      write(save,'"BrushColor":'+IntToStr(ColorToRGB(Figures[i].BColor))+',');
-    if i<>Length(Figures)-1 then
-      writeln(save,'"BrushStyleInd":'+IntToStr(Figures[i].BStyleInd)+'},')
-    else
-      write(save,'"BrushStyleInd":'+IntToStr(Figures[i].BStyleInd)+'}');
-    end;
-    writeln(save,']');
-    writeln(save,'  }');
-    write(save,'}');
+    write(save,SaveFile);
+    ShowMessage(SaveFile);
     closefile(save);
   end;
 end;
@@ -262,6 +200,16 @@ begin
      ATool.WriteREDOFigures;
      pb.Invalidate;
   end;
+
+  if (key=Ord('C')) and (ssCtrl in Shift) and (isDrawing=false)then begin
+     CopyFigure;
+     pb.Invalidate;
+  end;
+
+  if (key=Ord('V')) and (ssCtrl in Shift) and (isDrawing=false)then begin
+     PasteFigure;
+     pb.Invalidate;
+  end;
   if (key=VK_ADD)      or (key=VK_OEM_PLUS)  then
     FLoatSpinZoom.Value := FLoatSpinZoom.Value + 10;
   if (key=VK_SUBTRACT) or (key=VK_OEM_MINUS) then
@@ -282,9 +230,10 @@ begin
   Offset:= Point(0,0);
   isDrawing:=false;
   UPDpb:=Pb;
-
   BtnUndoCreate;
   BtnRedoCreate;
+  UndoRedoL.Data:=TStringList.Create;
+  UndoRedoL.Current:=Push(UndoRedoL,SaveFile);
 
   for i:=0 to High(Tools) do
   begin
@@ -363,7 +312,6 @@ end;
 procedure TMainForm.PbMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
-  ATool.CleanREDOFigures;
   if ssRight in Shift then
     if ATool.ClassName='TSelectTool' then begin
       Atool.rBtnPressed:= not Atool.rBtnPressed;
@@ -393,7 +341,8 @@ end;
 procedure TMainForm.PbMouseUp(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
-  ATool.MouseUp(Point(X,Y));
+  ATool.MouseUp();
+  Push(UndoRedoL,SaveFile);
   isDrawing:=false;
   panelchange:=false;
   Invalidate;

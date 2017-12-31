@@ -5,11 +5,13 @@ unit UFigure;
 interface
 
 uses
-  Classes, SysUtils,Graphics,Dialogs,UScale,ExtCtrls, Math ;
-
-
+  Classes, SysUtils,Graphics,Dialogs,UScale,ExtCtrls, Mathбfpjson, superobject, Clipbrd ;
 
 type
+  URList = record
+    Data:TStringList;
+    Head,Tail,Current:integer;
+  end;
 
   TFigure = class
   public
@@ -81,12 +83,102 @@ type
     procedure Draw(ACanvas:TCanvas); override;
   end;
 
+  function Push(var List:URList;S:String):integer;
+  function Undo(var List:URList):string;
+  function Redo(var List:URList):string;
+  function isEmpty(List:URList):boolean;
+  function SaveFile:string;
+  procedure SaveFigure(iFigure:TFigure;jObject:TJSONObject);
+const
+  MAXUNDOREDO = 20;
 var
   Figures: Array of TFigure;
-  REDOFigures: Array of TFigure;
-  //AFirstPoint:TPoint;
+  UndoRedoL:URList;
 
 implementation
+
+procedure SaveFigure(iFigure:TFigure;jObject:TJSONObject);
+var
+  jFigure:TJSONObject;
+  j:integer;
+begin
+    jFigure:=TJSONObject.Create;
+    with iFigure do begin
+      jFigure.Add('name', ClassName);
+      jFigure.Add('coord',TJSONArray.Create);
+      for j := 0 to high(Dpoints) do begin
+           jFigure.Arrays['coord'].Add(Dpoints[j].x);
+           jFigure.Arrays['coord'].Add(Dpoints[j].y);
+      end;
+      jFigure.Add('PenColor', PColor);
+      jFigure.Add('PenStyleInd', PStyleInd);
+      jFigure.Add('PenWidth',PWidth);
+      jFigure.Add('BrushColor', BColor);
+      jFigure.Add('BrushStyleInd', BStyleInd);
+      jFigure.Add('RoundedX',RoundedX);
+      jFigure.Add('RoundedY',RoundedY);
+  end;
+  jObject.Arrays['TFigures'].Add(jFigure);
+end;
+
+function SaveFile:String;
+var
+  i:integer;
+  jObject: TJSONObject;
+begin
+  jObject := TJSONObject.Create;
+  jObject.Add('TFigures', TJSONArray.Create);
+  for i:= 0 to High(Figures) do
+  begin
+    SaveFigure(Figures[i],jObject);
+  end;
+  Result:=jObject.FormatJSON;
+end;
+
+function isEmpty(List:URList):boolean;
+begin
+  Result:=List.Data.Count=0;
+end;
+
+function Push(var List:URList;S:String):integer;
+begin
+  if List.Data.Count <= MAXUNDOREDO then begin
+    List.Tail:=List.Data.Add(S);
+  end
+  else begin
+    List.Head:=0;
+    List.Data.Delete(List.Head);
+    List.Tail:=List.Data.Add(S);
+  end;
+  list.Current:=List.Tail;
+  Result:=List.Tail;
+end;
+
+function Redo(var List:URList):string;
+var
+  index:integer;
+begin
+  if (List.Current >= 0) and (List.Current < List.Tail) then begin
+    index:=List.Current+1;
+    List.Current:=index;
+    Result:=List.Data[index];
+  end
+  else
+    result:=List.Data[List.Current];
+end;
+
+function Undo(var List:URList):string;
+var
+  index:integer;
+begin
+  if (List.Current > 0) and (List.Current <= MAXUNDOREDO-1) then begin
+    index:=List.Current-1;
+    List.Current:=index;
+    Result:=List.Data[index];
+  end
+  else
+    result:=List.Data[List.Current];
+end;
 
 procedure TFigure.DrawOutline(Point1,Point2: TDoublePoint; Canvas: TCanvas);
 var
@@ -126,10 +218,6 @@ var
 begin
   for i := 0 to high(DPoints) do begin
       ACanvas.Rectangle(Rect(Wrld2Canvas(DPoints[i]).x-k-PWidth div 2,Wrld2Canvas(DPoints[i]).y-k-PWidth div 2,Wrld2Canvas(DPoints[i]).x+k+PWidth div 2,Wrld2Canvas(DPoints[i]).y+k+PWidth div 2));
-      {if ClassParent=TFillFigures then begin
-        ACanvas.Rectangle(Rect(Wrld2Canvas(DPoints[1]).x-k-PWidth div 2,Wrld2Canvas(DPoints[0]).y-k-PWidth div 2,Wrld2Canvas(DPoints[1]).x+k+PWidth div 2,Wrld2Canvas(DPoints[0]).y+k+PWidth div 2));
-        ACanvas.Rectangle(Rect(Wrld2Canvas(DPoints[0]).x-k-PWidth div 2,Wrld2Canvas(DPoints[1]).y-k-PWidth div 2,Wrld2Canvas(DPoints[0]).x+k+PWidth div 2,Wrld2Canvas(DPoints[1]).y+k+PWidth div 2));
-      end;}
   end;
 end;
 

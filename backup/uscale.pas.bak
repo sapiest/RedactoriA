@@ -8,7 +8,7 @@ uses
   Classes, SysUtils,Controls, math,Dialogs, Graphics;
 type
   TDoublePoint = record
-    x, y: Double;
+    x, y: Extended;
   end;
 
   TDoubleRect = record

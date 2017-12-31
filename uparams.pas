@@ -40,7 +40,7 @@ type
     RoundedX: integer;
     RoundedY: integer;
     PWidth: integer;
-    iFigure:TFigure;
+    itFigure:TFigure;
     procedure DeleteFigure(Sender:TObject);
     procedure SelectedPenColorButtonChanged(Sender: TObject);
     procedure PenColorButtonChanged(Sender: TObject);
@@ -80,14 +80,19 @@ begin
       inc(j);
     end;
  SetLength(Figures, j);
- UPDpb.Invalidate;
+ Push(UndoRedoL,SaveFile);
 end;
 
 procedure TParam.SelectedPenColorButtonChanged(Sender: TObject);
+var
+  jFigure:TFigure;
 begin
-  for iFigure in Figures do
-    if iFigure.Selected then
-      iFigure.PColor:=(Sender as TColorButton).ButtonColor;
+  for jFigure in Figures do begin
+    with jFigure do
+      if Selected then
+        PColor:=(Sender as TColorButton).ButtonColor;
+  end;
+  Push(UndoRedoL,SaveFile);
   UPDpb.Invalidate;
 end;
 
@@ -97,10 +102,15 @@ begin
 end;
 
 procedure TParam.SelectedBrushColorButtonChanged(Sender: TObject);
+var
+  jFigure:TFigure;
 begin
-  for iFigure in Figures do
-    if iFigure.Selected then
-      iFigure.BColor:=(Sender as TColorButton).ButtonColor;
+  for jFigure in Figures do begin
+    with jFigure do
+      if Selected then
+        BColor:=(Sender as TColorButton).ButtonColor;
+  end;
+  Push(UndoRedoL,SaveFile);
   UPDpb.Invalidate;
 end;
 
@@ -115,20 +125,28 @@ begin
 end;
 
 procedure TParam.SelectedPenWidthChange(Sender: TObject);
+var
+  jFigure:TFigure;
 begin
-  for iFigure in Figures do
-    if iFigure.Selected then
-      iFigure.PWidth:=(Sender as TSpinEdit).Value;
+  for jFigure in Figures do
+    with jFigure do
+      if Selected then
+        PWidth:=(Sender as TSpinEdit).Value;
+  Push(UndoRedoL,SaveFile);
   UPDpb.Invalidate;
 end;
 
 procedure TParam.SelectedBrushStyleChange(Sender: TObject);
+var
+  jFigure:TFigure;
 begin
-   for iFigure in Figures do
-    if iFigure.Selected then begin
-      iFigure.BStyleInd:=(Sender as TComboBox).ItemIndex;
-      iFigure.BStyle:=TypeBrushStyle.Style[(Sender as TComboBox).ItemIndex];
+   for jFigure in Figures do
+    with jFigure do
+    if Selected then begin
+      BStyleInd:=(Sender as TComboBox).ItemIndex;
+      BStyle:=TypeBrushStyle.Style[(Sender as TComboBox).ItemIndex];
     end;
+   Push(UndoRedoL,SaveFile);
    UPDpb.Invalidate;
 end;
 
@@ -139,12 +157,16 @@ begin
 end;
 
 procedure TParam.SelectedPenStyleChange(Sender: TObject);
+var
+  jFigure:TFigure;
 begin
-  for iFigure in Figures do
-    if iFigure.Selected then begin
-      iFigure.PStyleInd:=(Sender as TComboBox).ItemIndex;
-      iFigure.PStyle:=TypePenStyle.Style[(Sender as TComboBox).ItemIndex];
+  for jFigure in Figures do
+    with jFigure do
+    if Selected then begin
+      PStyleInd:=(Sender as TComboBox).ItemIndex;
+      PStyle:=TypePenStyle.Style[(Sender as TComboBox).ItemIndex];
     end;
+  Push(UndoRedoL,SaveFile);
   UPDpb.Invalidate;
 end;
 
@@ -155,10 +177,14 @@ begin
 end;
 
 procedure TParam.SelectedRoundXChange(Sender: TObject);
+var
+  jFigure:TFigure;
 begin
-   for iFigure in Figures do
-    if iFigure.Selected then
-      iFigure.RoundedX:=(Sender as TSpinEdit).Value;
+   for jFigure in Figures do
+     with jFigure do
+       if Selected then
+         RoundedX:=(Sender as TSpinEdit).Value;
+   Push(UndoRedoL,SaveFile);
    UPDpb.Invalidate;
 end;
 
@@ -168,10 +194,14 @@ begin
 end;
 
 procedure TParam.SelectedRoundYChange(Sender: TObject);
+var
+  jFigure:TFigure;
 begin
-   for iFigure in Figures do
-    if iFigure.Selected then
-      iFigure.RoundedY:=(Sender as TSpinEdit).Value;
+   for jFigure in Figures do
+     with jFigure do
+       if Selected then
+         RoundedY:=(Sender as TSpinEdit).Value;
+   Push(UndoRedoL,SaveFile);
    UPDpb.Invalidate;
 end;
 
