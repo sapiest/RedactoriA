@@ -93,7 +93,11 @@ const
   MAXUNDOREDO = 20;
 var
   Figures: Array of TFigure;
+<<<<<<< HEAD
   UndoRedoL:URList;
+=======
+  REDOFigures: Array of TFigure;
+>>>>>>> 2d8a89eadd38ffb2083fed07a5bd952c064b5ca2
 
 implementation
 

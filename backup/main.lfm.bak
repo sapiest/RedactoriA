@@ -1,7 +1,13 @@
 object MainForm: TMainForm
+<<<<<<< HEAD
   Left = 224
   Height = 650
   Top = 145
+=======
+  Left = 911
+  Height = 650
+  Top = 187
+>>>>>>> 2d8a89eadd38ffb2083fed07a5bd952c064b5ca2
   Width = 723
   Caption = 'RedactoriA'
   ClientHeight = 630

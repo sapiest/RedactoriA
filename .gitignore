@@ -1,4 +1,8 @@
 $ cat .gitignore
-*.exe
+/*.exe
 /lib
 /backup
+*.lps
+*.res
+*.bak
+*.dbg
