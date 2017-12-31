@@ -171,7 +171,7 @@ function Undo(var List:URList):string;
 var
   index:integer;
 begin
-  if (List.Current > 0) and (List.Current <= MAXUNDOREDO-1) then begin
+  if (List.Current > 0)  then begin
     index:=List.Current-1;
     List.Current:=index;
     Result:=List.Data[index];

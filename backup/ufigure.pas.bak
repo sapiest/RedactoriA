@@ -5,7 +5,7 @@ unit UFigure;
 interface
 
 uses
-  Classes, SysUtils,Graphics,Dialogs,UScale,ExtCtrls, Mathбfpjson, superobject, Clipbrd ;
+  Classes, SysUtils,Graphics,Dialogs,UScale,ExtCtrls, Math,fpjson, superobject, Clipbrd ;
 
 type
   URList = record
@@ -90,14 +90,10 @@ type
   function SaveFile:string;
   procedure SaveFigure(iFigure:TFigure;jObject:TJSONObject);
 const
-  MAXUNDOREDO = 20;
+  MAXUNDOREDO = 5;
 var
   Figures: Array of TFigure;
-<<<<<<< HEAD
   UndoRedoL:URList;
-=======
-  REDOFigures: Array of TFigure;
->>>>>>> 2d8a89eadd38ffb2083fed07a5bd952c064b5ca2
 
 implementation
 
@@ -175,7 +171,7 @@ function Undo(var List:URList):string;
 var
   index:integer;
 begin
-  if (List.Current > 0) and (List.Current <= MAXUNDOREDO-1) then begin
+  if (List.Current > 0)  then begin
     index:=List.Current-1;
     List.Current:=index;
     Result:=List.Data[index];

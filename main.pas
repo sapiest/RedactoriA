@@ -121,31 +121,22 @@ end;
 
 procedure TMainForm.MenuItemLoadClick(Sender: TObject);
 var
- JS,JS1: ISuperObject;
+ JS: ISuperObject;
  JSA,JSA1:TSuperArray;
  load:TextFile;
- S,S1,buf:String;
+ S,S1,S2,buf:String;
  i,j,k:integer;
 begin
   if OpenD.Execute then begin
     AssignFile(load,OpenD.FileName);
-<<<<<<< HEAD
     Reset(load);
-=======
-    Reset(load);;
->>>>>>> 2d8a89eadd38ffb2083fed07a5bd952c064b5ca2
     while not EOF(load) do begin
       Readln(load,buf);
       S:=S+buf;
     end;
     closefile(load);
-<<<<<<< HEAD
     SetLength(Figures,0);
     LoadFile(S);
-=======
-    LoadFile(S);
-    Invalidate;
->>>>>>> 2d8a89eadd38ffb2083fed07a5bd952c064b5ca2
   end;
 end;
 
@@ -157,10 +148,7 @@ begin
     AssignFile(save,SaveD.FileName);
     Rewrite(save);
     write(save,SaveFile);
-<<<<<<< HEAD
     ShowMessage(SaveFile);
-=======
->>>>>>> 2d8a89eadd38ffb2083fed07a5bd952c064b5ca2
     closefile(save);
   end;
 end;
@@ -205,19 +193,11 @@ procedure TMainForm.FormKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
   if (key=Ord('Z')) and (ssCtrl in Shift) and (isDrawing=false)then begin
-     WriteUNDOFigures;
+     ATool.WriteUNDOFigures;
      pb.Invalidate;
   end;
   if (key=Ord('Y')) and (ssCtrl in Shift) and (isDrawing=false)then begin
-     WriteREDOFigures;
-     pb.Invalidate;
-  end;
-  if (key=Ord('C')) and (ssCtrl in Shift) and (isDrawing=false)then begin
-     CopyFigure;
-     pb.Invalidate;
-  end;
-  if (key=Ord('V')) and (ssCtrl in Shift) and (isDrawing=false)then begin
-     PasteFigure;
+     ATool.WriteREDOFigures;
      pb.Invalidate;
   end;
 
@@ -286,7 +266,6 @@ begin
   AButton.Top := 0;
   AButton.Parent := ToolsPanel;
   AButton.onClick := @BitUNDOClick;
-  CreateStack(UndoStack);
 end;
 
 procedure TMainForm.BtnRedoCreate;
@@ -301,18 +280,17 @@ begin
   AButton.Top := 0;
   AButton.Parent := ToolsPanel;
   AButton.onClick := @BitREDOClick;
-  CreateStack(RedoStack);
 end;
 
 procedure TMainForm.BitUNDOClick(Sender: TObject);
 begin
-    WriteUNDOFigures;
+    ATool.WriteUNDOFigures;
   pb.Invalidate;
 end;
 
 procedure TMainForm.BitREDOClick(Sender: TObject);
 begin
-    WriteREDOFigures;
+    ATool.WriteREDOFigures;
   pb.Invalidate;
 end;
 
@@ -334,10 +312,6 @@ end;
 procedure TMainForm.PbMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
-<<<<<<< HEAD
-=======
-  CleanREDOFigures;
->>>>>>> 2d8a89eadd38ffb2083fed07a5bd952c064b5ca2
   if ssRight in Shift then
     if ATool.ClassName='TSelectTool' then begin
       Atool.rBtnPressed:= not Atool.rBtnPressed;

@@ -7,11 +7,7 @@ interface
 uses
   Classes, SysUtils,Graphics,UFigure,Dialogs, ExtCtrls, UScale, Controls, Spin, StdCtrls, Buttons,
   UParams, LCLType, FPCanvas, TypInfo, LCL, LCLIntf, Math,
-<<<<<<< HEAD
   FileUtil, Forms,fpjson, superobject, Clipbrd,
-=======
-  FileUtil, Forms,fpjson, superobject,Clipbrd,
->>>>>>> 2d8a89eadd38ffb2083fed07a5bd952c064b5ca2
   Menus
   ;
 type
@@ -21,16 +17,8 @@ type
     trFigure:TFigure;
   end;
 
-  PNode = ^Node; { указатель на узел }
-     Node = record
-       data: TFigure;  { данные }
-       next: PNode; { указатель на след. элемент }
-     end;
-
-
   TTool = class
   public
-
     MaxPoint, MinPoint:TDoublePoint;
     FigureClass:TFigureClass;
     Names,Pic:string;
@@ -54,12 +42,8 @@ type
 
     procedure PPanelCreate(APanel:TPanel);virtual;
     procedure MinMaxPoints;
-<<<<<<< HEAD
     procedure WriteUNDOFigures;
     procedure WriteREDOFigures;
-=======
-
->>>>>>> 2d8a89eadd38ffb2083fed07a5bd952c064b5ca2
     procedure FiguresDraw(pb:TPaintBox);
 end;
 
@@ -141,37 +125,12 @@ end;
     procedure PPanelCreate(APanel:TPanel);override;
   end;
 
-<<<<<<< HEAD
-=======
-
-    function isEmpty( S: PNode ): Boolean;
-    function Pop ( var Head: PNode ): TFigure;
-    procedure DeleteSt(var Head:PNode);
-    procedure CreateStack(var Head: PNode);
-    procedure Push( var Head: PNode; x: TFigure);
-    procedure CleanREDOFigures;
-    procedure CopyFigure;
-    procedure PasteFigure;
-    procedure WriteUNDOFigures;
-    procedure WriteREDOFigures;
-    procedure LayerDown;
-    procedure LayerUp;
-    function SaveFile:string;
-    function SaveFigure(iFigure:TFigure):String;
-    procedure LoadFile(S:string);
-    procedure LoadFigure(S:String);
-const
-  FiguresName: Array[0..4] of TFigureClass = (TRectangle,TLine,TPenLine,TRoundRect,TEllipse);
->>>>>>> 2d8a89eadd38ffb2083fed07a5bd952c064b5ca2
 var
   Tools: array of TTool;
   AParam: TParam;
-  UndoStack:PNode;
-  RedoStack:PNode;
 
 implementation
 
-<<<<<<< HEAD
 procedure PasteFigure;
 begin
   if Clipboard<>nil then
@@ -262,248 +221,16 @@ var
 begin
   JS:=SO(S);
   JSA:=(JS.A['TFigures']);
-=======
-procedure CopyFigure;
-var
-  iFigure:TFigure;
-  s:string;
-begin
-  for iFigure in Figures do begin
-    if iFigure.Selected then
-      begin
-        Clipboard.AsText:=SaveFigure(iFigure);
-      end;
-  end;
-  ShowMessage(Clipboard.AsText);
-end;
-
-procedure PasteFigure;
-begin
-  if Clipboard<>nil then
-    begin
-      LoadFigure(Clipboard.AsText);
-    end;
-end;
-
-function isEmpty ( S: PNode ): Boolean;
-begin
-  Result := (S = nil);
-end;
-
-
-function Pop ( var Head: PNode ): TFigure;
-var q: PNode;
-begin
-  if Head = nil then begin { стек пуст }
-    Result := nil; { неиспользуемый символ }
-    Exit;
-  end;
-  Result := Head^.data;
-  q := Head;
-  Head := Head^.next;
-  Dispose(q);
-end;
-
-procedure DeleteSt(var Head:PNode);
-var q: Pnode;
-begin
-  if Head <> nil then begin
-    q:=Head;
-    Head:=Head^.next;
-    Dispose(q);
-  end;
-end;
-
-procedure Push( var Head: PNode; x: TFigure);
- var NewNode: PNode;
- begin
-   New(NewNode);          { выделить память }
-   NewNode^.data := x;    { записать символ }
-   NewNode^.next := Head; { сделать первым узлом }
-   Head := NewNode;
- end;
-
-procedure CreateStack(var Head:Pnode);
-begin
-  Head:=nil;
-end;
-
-procedure CleanREDOFigures;
-begin
-  SetLength(REDOFigures,0);
-end;
-
-procedure writeUNDOFigures;
-var
-  i:integer;
-  iFigure:TFigure;
-  S:string;
-begin
-  if length(Figures)>0 then begin
-    for iFigure in Figures do
-    begin
-      Push(UndoStack,iFigure);
-    end;
-    Push(RedoStack,UndoStack^.data);
-    DeleteSt(UndoStack);
-    if Length(Figures) > 0 then begin
-      SetLength(Figures,High(Figures));
-    end;
-  end;
-end;
-
-procedure WriteREDOFigures;
-var
-  i:integer;
-begin
-  if not isEmpty(RedoStack)then begin
-    Push(UndoStack,RedoStack^.data);
-    SetLength(Figures,Length(Figures)+1);
-    Figures[High(Figures)]:=RedoStack^.data;
-    DeleteSt(RedoStack);
-  end;
-end;
-
-procedure LoadFigure(S:String);
-var
- JS,JS1: ISuperObject;
- JSA,JSA1:TSuperArray;
- k,i,j:integer;
- S1:string;
-begin
-    JS:=SO(S);
-    SetLength(Figures,Length(Figures)+1);
-    S1:= JS.S['name'];
-    for j:=0 to Length(FiguresName)-1 do begin
-      if FiguresName[j].ClassName=S1 then
-        Figures[High(Figures)]:=FiguresName[j].Create;
-    end;
-    //JS1:=SO(JSA.S[i]);
-    with Figures[High(Figures)] do begin
-      PWidth:=JS.i['PenWidth'];
-
-      PStyleInd:=JS.i['PenStyleInd'];
-      PStyle:=TypePenStyle.Style[PStyleInd];
-      PColor:=JS.i['PenColor'];
-      BColor:=JS.i['BrushColor'];
-      BStyleInd:=JS.i['BrushStyleInd'];
-      BStyle:=TypeBrushStyle.Style[BStyleInd];
-      RoundedX:=JS.i['RoundedX'];
-      RoundedY:=JS.i['RoundedY'];
-      JSA1:=JS.A['coord'];
-      k:=0;
-      for j:=0 to (JSA1.Length div 2)-1 do begin
-        SetLength(DPoints, Length(DPoints)+1);
-        DPoints[high(DPoints)]:=DoublePoint(JSA1.d[k],JSA1.d[k+1]);
-        K:=k+2;
-        ShowMessage(FloatToStr(DPoints[high(DPoints)].x)+' '+FloatToStr(DPoints[high(DPoints)].y));
-     end;
-
-    end;
-end;
-
-
-procedure LoadFile(S:string);
-var
- JS,JS1: ISuperObject;
- JSA,JSA1:TSuperArray;
- load:TextFile;
- S1,buf:String;
- i,j,k:integer;
-begin
-  SetLength(Figures,0);
-  FreeAndNil(Figures);
-  JSA:=(JS.A['TFigures']);
-  JS:=SO(S);
->>>>>>> 2d8a89eadd38ffb2083fed07a5bd952c064b5ca2
   for i:=0 to JSA.Length-1 do begin
     SetLength(Figures,Length(Figures)+1);
     S1:= SO(JSA.S[i]).S['name'];
     for j:=0 to Length(FiguresName)-1 do begin
       if FiguresName[j].ClassName=S1 then
-<<<<<<< HEAD
         Figures[High(Figures)]:=FiguresName[j].Create;
     end;
     JS1:=(SO(JSA.S[i]));
     LoadFigure(JS1,Figures[High(Figures)]);
   end;
-=======
-        Figures[i]:=FiguresName[j].Create;
-    end;
-    JS1:=SO(JSA.S[i]);
-    Figures[i].PWidth:=JS1.i['PenWidth'];
-    Figures[i].PStyleInd:=JS1.i['PenStyleInd'];
-    Figures[i].PStyle:=TypePenStyle.Style[Figures[i].PStyleInd];
-    Figures[i].PColor:=JS1.i['PenColor'];
-    Figures[i].BColor:=JS1.i['BrushColor'];
-    Figures[i].BStyleInd:=JS1.i['BrushStyleInd'];
-    Figures[i].BStyle:=TypeBrushStyle.Style[Figures[i].BStyleInd];
-    Figures[i].RoundedX:=JS1.i['RoundedX'];
-    Figures[i].RoundedY:=JS1.i['RoundedY'];
-    JSA1:=SO(JSA.S[i]).A['coord'];
-    k:=0;
-    for j:=0 to (JSA1.Length div 2)-1 do begin
-      SetLength(Figures[i].DPoints, Length(Figures[i].DPoints)+1);
-      Figures[i].DPoints[high(Figures[i].DPoints)]:=DoublePoint(JSA1.d[k],JSA1.d[k+1]);
-      K:=k+2;
-    end;
-  end;
-end;
-
-function SaveFigure(iFigure:TFigure):String;
-var
-   jObject, jFigure: TJSONObject;
-   j:integer;
-begin
-   with iFigure do begin
-   jFigure := TJSONObject.Create;
-   jFigure.Add('name', ClassName);
-   jFigure.Add('coord',TJSONArray.Create);
-   for j := 0 to high(Dpoints) do begin
-     jFigure.Arrays['coord'].Add(Dpoints[j].x);
-     jFigure.Arrays['coord'].Add(Dpoints[j].y);
-   end;
-   jFigure.Add('PenColor', PColor);
-   jFigure.Add('PenStyleInd',  PStyleInd);
-   jFigure.Add('PenWidth',PWidth);
-   jFigure.Add('BrushColor', BColor);
-   jFigure.Add('BrushStyleInd', BStyleInd);
-   jFigure.Add('RoundedX',RoundedX);
-   jFigure.Add('RoundedY',RoundedY);
-   end;
-   //jObject.Arrays['TFigures'].Add(jFigure);
- Result:=jFigure.FormatJSON;
-end;
-
-function SaveFile:String;
-var
-  i, j:integer;
-  jObject, jFigure: TJSONObject;
-  S:string;
-begin
-  jObject := TJSONObject.Create;
-  jObject.Add('RedactoriA@',1);
-  jObject.Add('TFigures', TJSONArray.Create);
-  for i:= 0 to High(Figures) do
-  begin
-    jFigure := TJSONObject.Create;
-    jFigure.Add('name', Figures[i].ClassName);
-    jFigure.Add('coord',TJSONArray.Create);
-    for j := 0 to high(Figures[i].Dpoints) do begin
-      jFigure.Arrays['coord'].Add(Figures[i].Dpoints[j].x);
-      jFigure.Arrays['coord'].Add(Figures[i].Dpoints[j].y);
-    end;
-    jFigure.Add('PenColor', Figures[i].PColor);
-    jFigure.Add('PenStyleInd',  Figures[i].PStyleInd);
-    jFigure.Add('PenWidth',Figures[i].PWidth);
-    jFigure.Add('BrushColor', Figures[i].BColor);
-    jFigure.Add('BrushStyleInd', Figures[i].BStyleInd);
-    jFigure.Add('RoundedX',Figures[i].RoundedX);
-    jFigure.Add('RoundedY',Figures[i].RoundedY);
-    jObject.Arrays['TFigures'].Add(jFigure);
-  end;
-  Result:=jObject.FormatJSON;
->>>>>>> 2d8a89eadd38ffb2083fed07a5bd952c064b5ca2
 end;
 
 procedure TTool.MouseDown(Apoint:TPoint);
@@ -890,11 +617,7 @@ begin
     AParam.CreateSpinEdit(APanel, 'Pen Width', GPWidth, @AParam.SelectedPenWidthChange);
   end
   else if bigselected then begin
-<<<<<<< HEAD
     if ((GRoundedY or GRoundedX)<> 0) then begin
-=======
-    if (iFigure.ClassName='TRoundRect') then begin
->>>>>>> 2d8a89eadd38ffb2083fed07a5bd952c064b5ca2
       AParam.CreateSpinEdit(APanel, 'Round Y', GRoundedY, @AParam.SelectedRoundYChange);
       AParam.CreateSpinEdit(APanel, 'Round X', GRoundedX, @AParam.SelectedRoundXChange);
     end;
@@ -992,7 +715,6 @@ begin
 
 end;
 
-<<<<<<< HEAD
 procedure TTool.writeUNDOFigures;
 begin
   if not isEmpty(UndoRedoL) then begin
@@ -1010,8 +732,6 @@ begin
     LoadFile(Redo(UndoRedoL));
 end;
 
-=======
->>>>>>> 2d8a89eadd38ffb2083fed07a5bd952c064b5ca2
 procedure TTool.FiguresDraw(pb:TPaintBox);
 var
   i:integer;

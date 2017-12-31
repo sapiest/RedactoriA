@@ -40,10 +40,7 @@ type
     RoundedX: integer;
     RoundedY: integer;
     PWidth: integer;
-<<<<<<< HEAD
     itFigure:TFigure;
-=======
->>>>>>> 2d8a89eadd38ffb2083fed07a5bd952c064b5ca2
     procedure DeleteFigure(Sender:TObject);
     procedure SelectedPenColorButtonChanged(Sender: TObject);
     procedure PenColorButtonChanged(Sender: TObject);
@@ -88,11 +85,7 @@ end;
 
 procedure TParam.SelectedPenColorButtonChanged(Sender: TObject);
 var
-<<<<<<< HEAD
   jFigure:TFigure;
-=======
-  iFigure:TFigure;
->>>>>>> 2d8a89eadd38ffb2083fed07a5bd952c064b5ca2
 begin
   for jFigure in Figures do begin
     with jFigure do
@@ -110,11 +103,7 @@ end;
 
 procedure TParam.SelectedBrushColorButtonChanged(Sender: TObject);
 var
-<<<<<<< HEAD
   jFigure:TFigure;
-=======
-  iFigure:TFigure;
->>>>>>> 2d8a89eadd38ffb2083fed07a5bd952c064b5ca2
 begin
   for jFigure in Figures do begin
     with jFigure do
@@ -137,11 +126,7 @@ end;
 
 procedure TParam.SelectedPenWidthChange(Sender: TObject);
 var
-<<<<<<< HEAD
   jFigure:TFigure;
-=======
-  iFigure:TFigure;
->>>>>>> 2d8a89eadd38ffb2083fed07a5bd952c064b5ca2
 begin
   for jFigure in Figures do
     with jFigure do
@@ -153,11 +138,7 @@ end;
 
 procedure TParam.SelectedBrushStyleChange(Sender: TObject);
 var
-<<<<<<< HEAD
   jFigure:TFigure;
-=======
-  iFigure:TFigure;
->>>>>>> 2d8a89eadd38ffb2083fed07a5bd952c064b5ca2
 begin
    for jFigure in Figures do
     with jFigure do
@@ -177,11 +158,7 @@ end;
 
 procedure TParam.SelectedPenStyleChange(Sender: TObject);
 var
-<<<<<<< HEAD
   jFigure:TFigure;
-=======
-  iFigure:TFigure;
->>>>>>> 2d8a89eadd38ffb2083fed07a5bd952c064b5ca2
 begin
   for jFigure in Figures do
     with jFigure do
@@ -201,11 +178,7 @@ end;
 
 procedure TParam.SelectedRoundXChange(Sender: TObject);
 var
-<<<<<<< HEAD
   jFigure:TFigure;
-=======
-  iFigure:TFigure;
->>>>>>> 2d8a89eadd38ffb2083fed07a5bd952c064b5ca2
 begin
    for jFigure in Figures do
      with jFigure do
@@ -222,11 +195,7 @@ end;
 
 procedure TParam.SelectedRoundYChange(Sender: TObject);
 var
-<<<<<<< HEAD
   jFigure:TFigure;
-=======
-  iFigure:TFigure;
->>>>>>> 2d8a89eadd38ffb2083fed07a5bd952c064b5ca2
 begin
    for jFigure in Figures do
      with jFigure do
