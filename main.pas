@@ -22,31 +22,35 @@ type
     MenuAbout: TMenuItem;
     MenuFile: TMenuItem;
     MenuF1: TMenuItem;
-    MenuItemLoad: TMenuItem;
+    ExportBtn: TMenuItem;
     MenuItemSave: TMenuItem;
+    MenuItemLoad: TMenuItem;
+    MenuItemSaveAs: TMenuItem;
     MenuItem3: TMenuItem;
     MenuItemUp: TMenuItem;
     MenuItemDown: TMenuItem;
     OpenD: TOpenDialog;
     SaveD: TSaveDialog;
+    ExportD: TSaveDialog;
     ScrollBarHor: TScrollBar;
     ScrollBarVert: TScrollBar;
     ToolsPanel: TPanel;
     Pb: TPaintBox;
-
+    PPanel:TPanel;
     procedure BtnUndoCreate;
     procedure BtnRedoCreate;
     procedure BitUNDOClick(Sender: TObject);
     procedure BitREDOClick(Sender: TObject);
     procedure FLoatSpinZoomChange(Sender: TObject);
+    procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure MenuAboutClick(Sender: TObject);
     procedure MenuExitClick(Sender: TObject);
-    procedure MenuFileClick(Sender: TObject);
-    procedure MenuItemLoadClick(Sender: TObject);
+    procedure ExportBtnClick(Sender: TObject);
     procedure MenuItemSaveClick(Sender: TObject);
-    procedure MenuItem3Click(Sender: TObject);
+    procedure MenuItemLoadClick(Sender: TObject);
+    procedure MenuItemSaveAsClick(Sender: TObject);
     procedure MenuItemUpClick(Sender: TObject);
     procedure MenuItemDownClick(Sender: TObject);
     procedure PanelCreate;
@@ -67,6 +71,7 @@ type
   private
      panelchange:boolean;
      isDrawing:boolean;
+     FileName:String;
     { private declarations }
   public
 
@@ -85,8 +90,6 @@ implementation
 { TMainForm }
 
 procedure TMainForm.PanelCreate;
-var
-  PPanel:TPanel;
 begin
   PPanel:=TPanel.Create(MainForm);
   PPanel.Parent:=MainForm;
@@ -114,18 +117,62 @@ begin
   close();
 end;
 
-procedure TMainForm.MenuFileClick(Sender: TObject);
+procedure TMainForm.ExportBtnClick(Sender: TObject);
+var
+  Bitmap: TBitmap;
+  PNG: TPortableNetworkGraphic;
+  JPG: TJPEGImage;
 begin
+    if ExportD.Execute then begin
+      ExportD.Title := 'Export';
+      Bitmap := TBitmap.Create;
+      Bitmap.LoadFromDevice(PB.Canvas.Handle);
+      Bitmap.Width := PB.Width;
+      Bitmap.Height := PB.Height;
+        case ExportD.FilterIndex of
+        1:
+          begin
+            Bitmap.SaveToFile(ExportD.Filename);
+            Bitmap.Free;
+          end;
+        2:
+          begin
+            PNG := TPortableNetworkGraphic.Create;
+            PNG.Assign(Bitmap);
+            PNG.SaveToFile(ExportD.Filename);
+            PNG.Free;
+          end;
+        3:
+          begin
+            JPG := TJPEGImage.Create;
+            JPG.Assign(Bitmap);
+            JPG.SaveToFile(ExportD.Filename);
+            JPG.Free;
+          end
+        end;
+        ShowMessage('Успешно');
+    end;
+end;
 
+procedure TMainForm.MenuItemSaveClick(Sender: TObject);
+var
+ save:TextFile;
+begin
+  if FileName <> 'Unnamed' then begin
+    AssignFile(save,FileName);
+    Rewrite(save);
+    write(save,SaveFile);
+    ShowMessage('Сохранено!');
+    closefile(save);
+  end
+  else
+    MenuItemSaveAsClick(Sender);
 end;
 
 procedure TMainForm.MenuItemLoadClick(Sender: TObject);
 var
- JS: ISuperObject;
- JSA,JSA1:TSuperArray;
- load:TextFile;
- S,S1,S2,buf:String;
- i,j,k:integer;
+  load:TextFile;
+  buf,s:string;
 begin
   if OpenD.Execute then begin
     AssignFile(load,OpenD.FileName);
@@ -137,25 +184,26 @@ begin
     closefile(load);
     SetLength(Figures,0);
     LoadFile(S);
+    MainForm.Caption:=OpenD.FileName;
+    ShowMessage('Загружено');
+    Changing:=false;
   end;
 end;
 
-procedure TMainForm.MenuItemSaveClick(Sender: TObject);
+procedure TMainForm.MenuItemSaveAsClick(Sender: TObject);
 var
- save:TextFile;
+  save:TextFile;
 begin
   if SaveD.Execute then begin
     AssignFile(save,SaveD.FileName);
     Rewrite(save);
     write(save,SaveFile);
-    ShowMessage(SaveFile);
+    MainForm.Caption:=SaveD.FileName;
+    FileName:=SaveD.FileName;
+    ShowMessage('Сохранено!');
     closefile(save);
+    Changing:=false;
   end;
-end;
-
-procedure TMainForm.MenuItem3Click(Sender: TObject);
-begin
-
 end;
 
 procedure TMainForm.MenuItemUpClick(Sender: TObject);
@@ -210,6 +258,17 @@ begin
      PasteFigure;
      pb.Invalidate;
   end;
+
+  if (key=Ord('S')) and (ssCtrl in Shift) and (isDrawing=false)then begin
+     MenuItemSaveClick(Sender);
+     pb.Invalidate;
+  end;
+
+   if (key=Ord('O')) and (ssCtrl in Shift) and (isDrawing=false)then begin
+     MenuItemLoadClick(Sender);
+     pb.Invalidate;
+  end;
+
   if (key=VK_ADD)      or (key=VK_OEM_PLUS)  then
     FLoatSpinZoom.Value := FLoatSpinZoom.Value + 10;
   if (key=VK_SUBTRACT) or (key=VK_OEM_MINUS) then
@@ -225,6 +284,7 @@ var
   AButton: TBitBtn;
   i: integer;
 begin
+  Forma:=MainForm;
   LastZoom:=Zoom;
   Zoom:= 1.0;
   Offset:= Point(0,0);
@@ -234,7 +294,7 @@ begin
   BtnRedoCreate;
   UndoRedoL.Data:=TStringList.Create;
   UndoRedoL.Current:=Push(UndoRedoL,SaveFile);
-
+  FileName:='Unnamed';
   for i:=0 to High(Tools) do
   begin
     AButton := TBitBtn.Create(ToolsPanel);
@@ -252,7 +312,6 @@ begin
   end;
   FLoatSpinZoom.MinValue := ZOOM_MIN * 100;
   FLoatSpinZoom.MaxValue := ZOOM_MAX * 100;
-
 end;
 
 procedure TMainForm.BtnUndoCreate;
@@ -300,6 +359,18 @@ begin
   pb.Invalidate;
 end;
 
+procedure TMainForm.FormClose(Sender: TObject; var CloseAction: TCloseAction);
+begin
+  if Changing then
+    if (Application.MessageBox('Сохранить текущий файл?',  'Сохранение',
+           MB_ICONQUESTION + MB_YESNO) = IDYES) then begin
+             if FileName <> 'Unnamed' then
+               MenuItemSave.Click()
+             else
+               MenuItemSaveAs.Click();
+           end;
+end;
+
 procedure TMainform.ToolsButtonClick(Sender : TObject);
 begin
   ATool := Tools[(Sender as TBitBtn).tag];
@@ -345,6 +416,7 @@ begin
   Push(UndoRedoL,SaveFile);
   isDrawing:=false;
   panelchange:=false;
+  Changing:=true;
   Invalidate;
 end;
 

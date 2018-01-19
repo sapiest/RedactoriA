@@ -5,7 +5,7 @@ unit UFigure;
 interface
 
 uses
-  Classes, SysUtils,Graphics,Dialogs,UScale,ExtCtrls, Math,fpjson, superobject, Clipbrd ;
+  Classes, SysUtils,Graphics,Dialogs,UScale,ExtCtrls, Math,fpjson, superobject, Clipbrd, StdCtrls;
 
 type
   URList = record
@@ -83,6 +83,11 @@ type
     procedure Draw(ACanvas:TCanvas); override;
   end;
 
+  TText = class(TFigure)
+    BMemo:TMemo;
+    procedure Draw(ACanvas:TCanvas); override;
+  end;
+
   function Push(var List:URList;S:String):integer;
   function Undo(var List:URList):string;
   function Redo(var List:URList):string;
@@ -90,7 +95,7 @@ type
   function SaveFile:string;
   procedure SaveFigure(iFigure:TFigure;jObject:TJSONObject);
 const
-  MAXUNDOREDO = 5;
+  MAXUNDOREDO = 20;
 var
   Figures: Array of TFigure;
   UndoRedoL:URList;
@@ -246,6 +251,11 @@ begin
   BColor:=BrushColor;
   BStyle:=BrushStyle.Style;
   BStyleInd:=BrushStyle.Index;
+end;
+
+procedure TText.Draw(ACanvas:TCanvas);
+begin
+  inherited;
 end;
 
 function TFigure.CheckPen(CoordA,CoordB,APoint:TPoint):boolean;

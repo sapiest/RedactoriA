@@ -1,25 +1,26 @@
 object MainForm: TMainForm
-  Left = 224
-  Height = 650
-  Top = 145
+  Left = 288
+  Height = 648
+  Top = 254
   Width = 723
   Caption = 'RedactoriA'
-  ClientHeight = 630
+  ClientHeight = 628
   ClientWidth = 723
   Constraints.MinHeight = 625
   Constraints.MinWidth = 635
   KeyPreview = True
   Menu = MainMenu
+  OnClose = FormClose
   OnCreate = FormCreate
   OnKeyDown = FormKeyDown
-  LCLVersion = '1.6.4.0'
+  LCLVersion = '1.8.0.6'
   object ToolsPanel: TPanel
     Left = 0
-    Height = 630
+    Height = 628
     Top = 0
     Width = 100
     Align = alLeft
-    ClientHeight = 630
+    ClientHeight = 628
     ClientWidth = 100
     Constraints.MaxWidth = 100
     Constraints.MinHeight = 50
@@ -28,7 +29,7 @@ object MainForm: TMainForm
     object FLoatSpinZoom: TFloatSpinEdit
       Left = 0
       Height = 23
-      Top = 607
+      Top = 605
       Width = 104
       Anchors = [akLeft, akRight, akBottom]
       Color = clMenu
@@ -43,7 +44,7 @@ object MainForm: TMainForm
   end
   object Pb: TPaintBox
     Left = 100
-    Height = 630
+    Height = 628
     Top = 0
     Width = 623
     Align = alClient
@@ -58,7 +59,7 @@ object MainForm: TMainForm
   object ScrollBarHor: TScrollBar
     Left = 100
     Height = 17
-    Top = 613
+    Top = 611
     Width = 620
     Anchors = [akLeft, akRight, akBottom]
     Max = 999
@@ -68,7 +69,7 @@ object MainForm: TMainForm
   end
   object ScrollBarVert: TScrollBar
     Left = 704
-    Height = 636
+    Height = 634
     Top = -6
     Width = 19
     Anchors = [akTop, akRight, akBottom]
@@ -81,10 +82,17 @@ object MainForm: TMainForm
   object MainMenu: TMainMenu
     object MenuFile: TMenuItem
       Caption = 'Файл'
-      OnClick = MenuFileClick
+      object ExportBtn: TMenuItem
+        Caption = 'Экспорт'
+        OnClick = ExportBtnClick
+      end
       object MenuItemSave: TMenuItem
         Caption = 'Сохранить'
         OnClick = MenuItemSaveClick
+      end
+      object MenuItemSaveAs: TMenuItem
+        Caption = 'Сохранить как'
+        OnClick = MenuItemSaveAsClick
       end
       object MenuItemLoad: TMenuItem
         Caption = 'Загрузить'
@@ -97,7 +105,6 @@ object MainForm: TMainForm
     end
     object MenuItem3: TMenuItem
       Caption = 'Свойства'
-      OnClick = MenuItem3Click
       object MenuItemUp: TMenuItem
         Caption = 'Вверх'
         OnClick = MenuItemUpClick
@@ -124,6 +131,12 @@ object MainForm: TMainForm
   object SaveD: TSaveDialog
     DefaultExt = '.toxaxab'
     Filter = 'Redactoria|*.toxaxab'
-    left = 29
+    left = 32
+  end
+  object ExportD: TSaveDialog
+    Title = 'Экспортировать файл как'
+    DefaultExt = '.toxaxab'
+    Filter = 'PNG|*.png|JPG|*.jpg|BMP|*.bmp'
+    left = 32
   end
 end

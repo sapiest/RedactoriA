@@ -5,7 +5,7 @@ unit UFigure;
 interface
 
 uses
-  Classes, SysUtils,Graphics,Dialogs,UScale,ExtCtrls, Math,fpjson, superobject, Clipbrd ;
+  Classes, SysUtils,Graphics,Dialogs,UScale,ExtCtrls, Math,fpjson, superobject, Clipbrd, StdCtrls;
 
 type
   URList = record
@@ -80,6 +80,10 @@ type
   end;
 
   TSelect = class(TFigure)
+    procedure Draw(ACanvas:TCanvas); override;
+  end;
+
+  TText = class(TFigure)
     procedure Draw(ACanvas:TCanvas); override;
   end;
 
@@ -246,6 +250,11 @@ begin
   BColor:=BrushColor;
   BStyle:=BrushStyle.Style;
   BStyleInd:=BrushStyle.Index;
+end;
+
+procedure TText.Draw(ACanvas:TCanvas);
+begin
+  inherited;
 end;
 
 function TFigure.CheckPen(CoordA,CoordB,APoint:TPoint):boolean;

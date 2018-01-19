@@ -65,6 +65,8 @@ var
   TypeBrushStyle: RBrushStyle;
   TypePenStyle: RPenStyle;
   UPDpb:TPaintBox;
+  Changing:boolean;
+
 implementation
 
 procedure TParam.DeleteFigure(Sender: TObject);
@@ -93,6 +95,7 @@ begin
         PColor:=(Sender as TColorButton).ButtonColor;
   end;
   Push(UndoRedoL,SaveFile);
+  Changing:=true;
   UPDpb.Invalidate;
 end;
 
@@ -111,6 +114,7 @@ begin
         BColor:=(Sender as TColorButton).ButtonColor;
   end;
   Push(UndoRedoL,SaveFile);
+  Changing:=true;
   UPDpb.Invalidate;
 end;
 
@@ -133,6 +137,7 @@ begin
       if Selected then
         PWidth:=(Sender as TSpinEdit).Value;
   Push(UndoRedoL,SaveFile);
+  Changing:=true;
   UPDpb.Invalidate;
 end;
 
@@ -147,6 +152,7 @@ begin
       BStyle:=TypeBrushStyle.Style[(Sender as TComboBox).ItemIndex];
     end;
    Push(UndoRedoL,SaveFile);
+   Changing:=true;
    UPDpb.Invalidate;
 end;
 
@@ -167,6 +173,7 @@ begin
       PStyle:=TypePenStyle.Style[(Sender as TComboBox).ItemIndex];
     end;
   Push(UndoRedoL,SaveFile);
+  Changing:=true;
   UPDpb.Invalidate;
 end;
 
@@ -185,6 +192,7 @@ begin
        if Selected then
          RoundedX:=(Sender as TSpinEdit).Value;
    Push(UndoRedoL,SaveFile);
+   Changing:=true;
    UPDpb.Invalidate;
 end;
 
@@ -202,6 +210,7 @@ begin
        if Selected then
          RoundedY:=(Sender as TSpinEdit).Value;
    Push(UndoRedoL,SaveFile);
+   Changing:=true;
    UPDpb.Invalidate;
 end;
 

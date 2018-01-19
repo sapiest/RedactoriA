@@ -1,7 +1,7 @@
 object MainForm: TMainForm
-  Left = 224
+  Left = 742
   Height = 650
-  Top = 145
+  Top = 115
   Width = 723
   Caption = 'RedactoriA'
   ClientHeight = 630
@@ -81,7 +81,6 @@ object MainForm: TMainForm
   object MainMenu: TMainMenu
     object MenuFile: TMenuItem
       Caption = 'Файл'
-      OnClick = MenuFileClick
       object MenuItemSave: TMenuItem
         Caption = 'Сохранить'
         OnClick = MenuItemSaveClick
@@ -97,7 +96,6 @@ object MainForm: TMainForm
     end
     object MenuItem3: TMenuItem
       Caption = 'Свойства'
-      OnClick = MenuItem3Click
       object MenuItemUp: TMenuItem
         Caption = 'Вверх'
         OnClick = MenuItemUpClick
@@ -124,6 +122,6 @@ object MainForm: TMainForm
   object SaveD: TSaveDialog
     DefaultExt = '.toxaxab'
     Filter = 'Redactoria|*.toxaxab'
-    left = 29
+    left = 32
   end
 end

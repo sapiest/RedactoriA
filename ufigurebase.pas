@@ -125,6 +125,15 @@ end;
     procedure PPanelCreate(APanel:TPanel);override;
   end;
 
+  TTextTool = class(TTool)
+    BMemo:TMemo;
+    FirstPoint:TPoint;
+    procedure MouseDown(APoint:TPoint);override;
+    procedure MouseMove(APoint:TPoint);override;
+    procedure MouseUp();override;
+    procedure PPanelCreate(APanel:TPanel);override;
+  end;
+
   procedure CopyFigure;
   procedure PasteFigure;
   procedure LoadFigure(JS:ISuperObject;iFigure:TFigure);
@@ -137,6 +146,7 @@ const
 var
   Tools: array of TTool;
   AParam: TParam;
+  Forma:TForm;
 
 implementation
 
@@ -448,6 +458,32 @@ end;
 procedure TRectangleTool.MouseUp();
 begin
   inherited;
+end;
+
+procedure TTextTool.MouseDown(APoint:TPoint);
+begin
+  {FirstPoint:=APoint;
+  SetLength(Figures, Length(Figures) + 1);
+  Figures[High(Figures)] := TText.Create;
+  BMemo := TMemo.Create(UPDpb);
+  BMemo.Left:=FirstPoint.x;
+  BMemo.Top:=FirstPoint.y;
+  BMemo.Parent:=UPDpb.Parent;  }
+
+end;
+
+procedure TTextTool.MouseMove(APoint:TPoint);
+begin
+end;
+
+procedure TTextTool.MouseUp();
+begin
+  inherited;
+end;
+
+procedure TTextTool.PPanelCreate(APanel: TPanel);
+begin
+
 end;
 
 procedure TRectangleTool.PPanelCreate (APanel: TPanel);
@@ -787,6 +823,7 @@ initialization
   RegisterTool(TRoundRectTool.Create, TRoundRect,'RoundRect','assets/roundrect.bmp');
   //RegisterTool(TMagnifierTool.Create, nil ,'Magnifier','assets/pencil.bmp');
   RegisterTool(TSelectTool.Create, nil ,'Select','assets/select.bmp');
+  //RegisterTool(TTextTool.Create,Ttext,'Text','assets/pencil.bmp');
 
   RegisterBrushSt(bsBDiagonal, 'BDiagonal');
   RegisterBrushSt(bsFDiagonal, 'FDiagonal');

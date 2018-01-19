@@ -33,7 +33,7 @@ type
     ScrollBarVert: TScrollBar;
     ToolsPanel: TPanel;
     Pb: TPaintBox;
-
+    PPanel:TPanel;
     procedure BtnUndoCreate;
     procedure BtnRedoCreate;
     procedure BitUNDOClick(Sender: TObject);
@@ -43,10 +43,8 @@ type
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure MenuAboutClick(Sender: TObject);
     procedure MenuExitClick(Sender: TObject);
-    procedure MenuFileClick(Sender: TObject);
     procedure MenuItemLoadClick(Sender: TObject);
     procedure MenuItemSaveClick(Sender: TObject);
-    procedure MenuItem3Click(Sender: TObject);
     procedure MenuItemUpClick(Sender: TObject);
     procedure MenuItemDownClick(Sender: TObject);
     procedure PanelCreate;
@@ -85,8 +83,6 @@ implementation
 { TMainForm }
 
 procedure TMainForm.PanelCreate;
-var
-  PPanel:TPanel;
 begin
   PPanel:=TPanel.Create(MainForm);
   PPanel.Parent:=MainForm;
@@ -114,18 +110,11 @@ begin
   close();
 end;
 
-procedure TMainForm.MenuFileClick(Sender: TObject);
-begin
-
-end;
 
 procedure TMainForm.MenuItemLoadClick(Sender: TObject);
 var
- JS: ISuperObject;
- JSA,JSA1:TSuperArray;
  load:TextFile;
- S,S1,S2,buf:String;
- i,j,k:integer;
+ buf,s:string;
 begin
   if OpenD.Execute then begin
     AssignFile(load,OpenD.FileName);
@@ -140,6 +129,7 @@ begin
   end;
 end;
 
+
 procedure TMainForm.MenuItemSaveClick(Sender: TObject);
 var
  save:TextFile;
@@ -151,11 +141,6 @@ begin
     ShowMessage(SaveFile);
     closefile(save);
   end;
-end;
-
-procedure TMainForm.MenuItem3Click(Sender: TObject);
-begin
-
 end;
 
 procedure TMainForm.MenuItemUpClick(Sender: TObject);
@@ -225,6 +210,7 @@ var
   AButton: TBitBtn;
   i: integer;
 begin
+  Forma:=MainForm;
   LastZoom:=Zoom;
   Zoom:= 1.0;
   Offset:= Point(0,0);
@@ -252,7 +238,6 @@ begin
   end;
   FLoatSpinZoom.MinValue := ZOOM_MIN * 100;
   FLoatSpinZoom.MaxValue := ZOOM_MAX * 100;
-
 end;
 
 procedure TMainForm.BtnUndoCreate;
@@ -342,7 +327,7 @@ procedure TMainForm.PbMouseUp(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
   ATool.MouseUp();
-  UndoRedoL.Current:=Push(UndoRedoL,SaveFile);
+  Push(UndoRedoL,SaveFile);
   isDrawing:=false;
   panelchange:=false;
   Invalidate;

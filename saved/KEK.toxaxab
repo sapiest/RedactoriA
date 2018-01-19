@@ -1,0 +1,68 @@
+{
+  "TFigures" : [
+    {
+      "name" : "TRectangle",
+      "coord" : [
+        4.8000000000000000E+001,
+        6.2000000000000000E+001,
+        1.3900000000000000E+002,
+        1.7000000000000000E+002
+      ],
+      "PenColor" : 0,
+      "PenStyleInd" : 5,
+      "PenWidth" : 1,
+      "BrushColor" : 16777215,
+      "BrushStyleInd" : 6,
+      "RoundedX" : 0,
+      "RoundedY" : 0
+    },
+    {
+      "name" : "TRectangle",
+      "coord" : [
+        2.2300000000000000E+002,
+        2.4200000000000000E+002,
+        2.7300000000000000E+002,
+        3.2000000000000000E+002
+      ],
+      "PenColor" : 0,
+      "PenStyleInd" : 5,
+      "PenWidth" : 1,
+      "BrushColor" : 16777215,
+      "BrushStyleInd" : 6,
+      "RoundedX" : 0,
+      "RoundedY" : 0
+    },
+    {
+      "name" : "TRectangle",
+      "coord" : [
+        2.2700000000000000E+002,
+        1.4000000000000000E+002,
+        1.8900000000000000E+002,
+        2.1800000000000000E+002
+      ],
+      "PenColor" : 0,
+      "PenStyleInd" : 5,
+      "PenWidth" : 1,
+      "BrushColor" : 16777215,
+      "BrushStyleInd" : 6,
+      "RoundedX" : 0,
+      "RoundedY" : 0
+    },
+    {
+      "name" : "TRectangle",
+      "coord" : [
+        1.9000000000000000E+002,
+        3.4800000000000000E+002,
+        1.8900000000000000E+002,
+        4.1300000000000000E+002
+      ],
+      "PenColor" : 0,
+      "PenStyleInd" : 5,
+      "PenWidth" : 1,
+      "BrushColor" : 16777215,
+      "BrushStyleInd" : 6,
+      "RoundedX" : 0,
+      "RoundedY" : 0
+    }
+  ]
+}
